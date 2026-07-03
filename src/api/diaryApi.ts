@@ -14,10 +14,12 @@ export interface DiaryStorageStatus {
     dataDir: string
     entriesDir: string
     backupsDir: string
+    trashDir: string
     indexPath: string
     diaryCount: number
     markdownFileCount: number
     backupCount: number
+    trashCount: number
     latestBackup: string
     indexHealthy: boolean
     missingFiles: string[]
@@ -107,6 +109,39 @@ export default {
         return request('post', null, null, 'diary/backup', 120000) as Promise<{
             success: boolean,
             data: {backupPath: string, status: DiaryStorageStatus},
+            message: string
+        }>
+    },
+    rebuildIndex(dryRun = false): Promise<{
+        success: boolean,
+        data: {dryRun: boolean, nextId: number, entryCount: number, entries: Array<any>, status: DiaryStorageStatus},
+        message: string
+    }> {
+        return request('post', null, {dryRun}, 'diary/rebuild-index', 120000) as Promise<{
+            success: boolean,
+            data: {dryRun: boolean, nextId: number, entryCount: number, entries: Array<any>, status: DiaryStorageStatus},
+            message: string
+        }>
+    },
+    trash(): Promise<{
+        success: boolean,
+        data: string[],
+        message: string
+    }> {
+        return request('get', null, null, 'diary/trash') as Promise<{
+            success: boolean,
+            data: string[],
+            message: string
+        }>
+    },
+    restoreTrash(fileName: string): Promise<{
+        success: boolean,
+        data: {entry: EntityDiaryFromServer, status: DiaryStorageStatus},
+        message: string
+    }> {
+        return request('post', null, {fileName}, 'diary/trash/restore', 120000) as Promise<{
+            success: boolean,
+            data: {entry: EntityDiaryFromServer, status: DiaryStorageStatus},
             message: string
         }>
     },

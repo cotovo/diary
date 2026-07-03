@@ -14,6 +14,7 @@ loadEnvFile(path.join(rootDir, ".env"));
 const dataDir = path.resolve(process.env.DIARY_DATA_DIR || path.join(rootDir, "data"));
 const entriesDir = path.join(dataDir, "entries");
 const backupsDir = path.join(dataDir, "backups");
+const trashDir = path.join(dataDir, "trash");
 const indexPath = path.join(dataDir, "index.json");
 const configPath = path.join(dataDir, "config.json");
 const distDir = path.join(rootDir, "dist");
@@ -99,6 +100,7 @@ function sendText(res, status, text, contentType = "text/plain; charset=utf-8") 
 async function ensureData() {
   await fs.mkdir(entriesDir, { recursive: true });
   await fs.mkdir(backupsDir, { recursive: true });
+  await fs.mkdir(trashDir, { recursive: true });
 
   if (!fsSync.existsSync(indexPath)) {
     await writeJson(indexPath, { nextId: 1, entries: [] });
@@ -406,8 +408,89 @@ async function backupCurrentData(reason) {
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const backupPath = path.join(backupsDir, `${stamp}-${reason}.json`);
   const index = await readIndex();
-  await writeJson(backupPath, index);
+  const config = await readConfig();
+  const entries = await Promise.all(
+    index.entries.map(async (entry) => {
+      try {
+        const absolutePath = safeDataPath(entry.filePath);
+        return {
+          meta: entry,
+          filePath: entry.filePath,
+          markdown: await fs.readFile(absolutePath, "utf8"),
+        };
+      } catch (err) {
+        return {
+          meta: entry,
+          filePath: entry.filePath,
+          markdown: null,
+          error: err instanceof Error ? err.message : "读取失败",
+        };
+      }
+    }),
+  );
+  await writeJson(backupPath, {
+    version: 2,
+    reason,
+    createdAt: new Date().toISOString(),
+    index,
+    config,
+    entries,
+  });
   return backupPath;
+}
+
+async function listTrashFiles() {
+  try {
+    const files = await fs.readdir(trashDir, { withFileTypes: true });
+    return files
+      .filter((item) => item.isFile() && item.name.endsWith(".json"))
+      .map((item) => item.name)
+      .sort()
+      .reverse();
+  } catch {
+    return [];
+  }
+}
+
+async function moveEntryToTrash(entry) {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const trashPath = path.join(trashDir, `${stamp}-${entry.id}.json`);
+  let markdown = "";
+  try {
+    markdown = await fs.readFile(safeDataPath(entry.filePath), "utf8");
+  } catch {
+    markdown = "";
+  }
+  await writeJson(trashPath, {
+    version: 1,
+    deletedAt: new Date().toISOString(),
+    entry,
+    markdown,
+  });
+  await fs.rm(safeDataPath(entry.filePath), { force: true });
+  return trashPath;
+}
+
+async function restoreTrashItem(fileName) {
+  const trashPath = path.resolve(trashDir, fileName);
+  if (!trashPath.startsWith(trashDir) || !fileName.endsWith(".json")) {
+    throw new Error("非法回收站文件");
+  }
+  const item = await readJson(trashPath, null);
+  if (!item?.entry?.filePath || typeof item.markdown !== "string") {
+    throw new Error("回收站文件损坏");
+  }
+  const index = await readIndex();
+  if (index.entries.some((entry) => Number(entry.id) === Number(item.entry.id))) {
+    throw new Error("同 ID 日记已存在，无法恢复");
+  }
+  const targetPath = safeDataPath(item.entry.filePath);
+  await fs.mkdir(path.dirname(targetPath), { recursive: true });
+  await fs.writeFile(targetPath, item.markdown, "utf8");
+  index.entries.push(item.entry);
+  await writeIndex(index);
+  await fs.rm(trashPath, { force: true });
+  return item.entry;
 }
 
 async function countMarkdownFiles(dir) {
@@ -444,6 +527,7 @@ async function listBackupFiles() {
 async function getStorageStatus() {
   const index = await readIndex();
   const backupFiles = await listBackupFiles();
+  const trashFiles = await listTrashFiles();
   const markdownCount = await countMarkdownFiles(entriesDir);
   const missingFiles = [];
   for (const entry of index.entries) {
@@ -457,13 +541,61 @@ async function getStorageStatus() {
     dataDir,
     entriesDir,
     backupsDir,
+    trashDir,
     indexPath,
     diaryCount: index.entries.length,
     markdownFileCount: markdownCount,
     backupCount: backupFiles.length,
+    trashCount: trashFiles.length,
     latestBackup: backupFiles[0] || "",
     indexHealthy: missingFiles.length === 0,
     missingFiles,
+  };
+}
+
+async function rebuildIndexFromFiles({ dryRun = false } = {}) {
+  const rebuiltEntries = [];
+  async function walk(dir) {
+    const items = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
+    for (const item of items) {
+      const absolutePath = path.join(dir, item.name);
+      if (item.isDirectory()) {
+        await walk(absolutePath);
+      } else if (item.isFile() && item.name.endsWith(".md")) {
+        const raw = await fs.readFile(absolutePath, "utf8");
+        const parsed = parseMarkdownWithFrontmatter(raw);
+        const relativePath = path.relative(dataDir, absolutePath).replace(/\\/g, "/");
+        const id = Number(parsed.meta.id || path.basename(item.name, ".md"));
+        if (!Number.isFinite(id)) continue;
+        rebuiltEntries.push({
+          ...parsed.meta,
+          id,
+          title: parsed.meta.title || "未命名日记",
+          date: parsed.meta.date || new Date().toISOString(),
+          category: parsed.meta.category || parsed.meta.mood || "life",
+          mood: parsed.meta.mood || parsed.meta.category || "life",
+          tags: Array.isArray(parsed.meta.tags) ? parsed.meta.tags : [parsed.meta.category || "life"],
+          createdAt: parsed.meta.createdAt || parsed.meta.date || new Date().toISOString(),
+          updatedAt: parsed.meta.updatedAt || parsed.meta.date || new Date().toISOString(),
+          wordCount: parsed.meta.wordCount || wordCount(parsed.meta.title, parsed.content),
+          excerpt: parsed.meta.excerpt || excerpt(parsed.content),
+          filePath: relativePath,
+        });
+      }
+    }
+  }
+  await walk(entriesDir);
+  rebuiltEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || Number(b.id) - Number(a.id));
+  const nextId = rebuiltEntries.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1;
+  if (!dryRun) {
+    await backupCurrentData("before-rebuild-index");
+    await writeIndex({ nextId, entries: rebuiltEntries });
+  }
+  return {
+    dryRun,
+    nextId,
+    entryCount: rebuiltEntries.length,
+    entries: rebuiltEntries,
   };
 }
 
@@ -633,6 +765,21 @@ async function handleApi(req, res, route, params) {
     ok(res, { backupPath, status: await getStorageStatus() }, "备份已创建");
     return;
   }
+  if (route === "diary/rebuild-index" && req.method === "POST") {
+    const result = await rebuildIndexFromFiles({ dryRun: !!body?.dryRun });
+    ok(res, { ...result, status: await getStorageStatus() }, body?.dryRun ? "索引预检完成" : "索引已重建");
+    return;
+  }
+  if (route === "diary/trash" && req.method === "GET") {
+    ok(res, await listTrashFiles());
+    return;
+  }
+  if (route === "diary/trash/restore" && req.method === "POST") {
+    await backupCurrentData("before-trash-restore");
+    const entry = await restoreTrashItem(String(body?.fileName || ""));
+    ok(res, { entry, status: await getStorageStatus() }, "日记已恢复");
+    return;
+  }
   if (route === "diary/export-full" && req.method === "GET") {
     ok(res, await buildFullExport(params));
     return;
@@ -711,10 +858,10 @@ async function handleApi(req, res, route, params) {
       return;
     }
     await backupCurrentData("before-delete");
-    await fs.rm(safeDataPath(entry.filePath), { force: true });
+    await moveEntryToTrash(entry);
     index.entries = index.entries.filter((item) => Number(item.id) !== id);
     await writeIndex(index);
-    ok(res, null, "日记已删除");
+    ok(res, null, "日记已移入回收站");
     return;
   }
   if (route === "diary/clear" && req.method === "POST") {

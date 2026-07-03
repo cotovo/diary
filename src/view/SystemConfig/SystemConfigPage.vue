@@ -69,6 +69,7 @@
                                 <MetricTile label="日记数量" :value="storageStatus.diaryCount"/>
                                 <MetricTile label="Markdown 文件" :value="storageStatus.markdownFileCount"/>
                                 <MetricTile label="备份数量" :value="storageStatus.backupCount"/>
+                                <MetricTile label="回收站" :value="storageStatus.trashCount"/>
                                 <MetricTile
                                     label="索引状态"
                                     :value="storageStatus.indexHealthy ? '正常' : '异常'"
@@ -80,6 +81,7 @@
                                 <NDescriptionsItem label="数据目录">{{ storageStatus.dataDir }}</NDescriptionsItem>
                                 <NDescriptionsItem label="索引文件">{{ storageStatus.indexPath }}</NDescriptionsItem>
                                 <NDescriptionsItem label="备份目录">{{ storageStatus.backupsDir }}</NDescriptionsItem>
+                                <NDescriptionsItem label="回收站目录">{{ storageStatus.trashDir }}</NDescriptionsItem>
                                 <NDescriptionsItem label="最新备份">
                                     {{ storageStatus.latestBackup || '暂无备份' }}
                                 </NDescriptionsItem>
@@ -118,6 +120,52 @@
                     </NSpin>
                 </div>
             </section>
+
+            <section class="modern-panel">
+                <div class="modern-panel-header">
+                    <h2>智能维护</h2>
+                    <p>处理复杂边界：误删恢复、索引与 Markdown 文件不一致、备份前置保护。</p>
+                </div>
+                <div class="modern-panel-body storage-stack">
+                    <NAlert type="success" :bordered="false">
+                        删除日记现在会先创建完整备份，再移入回收站；重建索引前也会自动备份当前状态。
+                    </NAlert>
+                    <NAlert v-if="storageStatus && storageStatus.missingFiles.length > 0" type="warning" :bordered="false">
+                        检测到 {{ storageStatus.missingFiles.length }} 个索引缺失文件，可先完整导出，再执行索引重建。
+                    </NAlert>
+                    <div class="settings-actions">
+                        <NButton :loading="isRebuilding" @click="previewRebuildIndex">
+                            <template #icon><ScanSearch :size="18"/></template>
+                            索引预检
+                        </NButton>
+                        <NButton type="warning" secondary :loading="isRebuilding" @click="confirmRebuildIndex">
+                            <template #icon><Wrench :size="18"/></template>
+                            重建索引
+                        </NButton>
+                        <NButton :loading="isLoadingTrash" @click="loadTrash">
+                            <template #icon><Trash2 :size="18"/></template>
+                            查看回收站
+                        </NButton>
+                        <NButton
+                            type="primary"
+                            secondary
+                            :disabled="trashFiles.length === 0"
+                            :loading="isRestoring"
+                            @click="confirmRestoreLatest"
+                        >
+                            <template #icon><RotateCcw :size="18"/></template>
+                            恢复最近删除
+                        </NButton>
+                    </div>
+                    <NDataTable
+                        v-if="trashFiles.length"
+                        size="small"
+                        :columns="trashColumns"
+                        :data="trashRows"
+                        :pagination="{pageSize: 5}"
+                    />
+                </div>
+            </section>
         </div>
     </ModernPage>
 </template>
@@ -135,9 +183,11 @@ import {
     NGrid,
     NInput,
     NSpin,
+    NDataTable,
+    useDialog,
     useMessage
 } from "naive-ui"
-import {Archive, Database, Download, KeyRound, RefreshCw} from "@lucide/vue"
+import {Archive, Database, Download, KeyRound, RefreshCw, RotateCcw, ScanSearch, Trash2, Wrench} from "@lucide/vue"
 
 import diaryApi, {DiaryStorageStatus} from "@/api/diaryApi"
 import systemConfigApi from "@/api/systemConfigApi"
@@ -151,6 +201,7 @@ import {dateFormatter} from "@/utility"
 
 const router = useRouter()
 const message = useMessage()
+const dialog = useDialog()
 const projectStore = useProjectStore()
 const systemConfigStore = useSystemConfigStore()
 
@@ -159,13 +210,22 @@ const isSaving = ref(false)
 const isStorageLoading = ref(true)
 const isBackingUp = ref(false)
 const isExporting = ref(false)
+const isRebuilding = ref(false)
+const isLoadingTrash = ref(false)
+const isRestoring = ref(false)
 const storageStatus = ref<DiaryStorageStatus | null>(null)
+const trashFiles = ref<string[]>([])
 
 const form = reactive<AdminSystemConfig>({
     ...DEFAULT_ADMIN_SYSTEM_CONFIG
 })
 
 const isFormValid = computed(() => true)
+const trashRows = computed(() => trashFiles.value.map((fileName, index) => ({index: index + 1, fileName})))
+const trashColumns = [
+    {title: '#', key: 'index', width: 60},
+    {title: '回收站文件', key: 'fileName'},
+]
 
 onBeforeMount(() => {
     if (!projectStore.isAdminUser) {
@@ -230,6 +290,80 @@ async function createBackup() {
         message.error(err?.message || '备份失败')
     } finally {
         isBackingUp.value = false
+    }
+}
+
+async function previewRebuildIndex() {
+    isRebuilding.value = true
+    try {
+        const res = await diaryApi.rebuildIndex(true)
+        message.info(`预检完成：可从 Markdown 文件重建 ${res.data.entryCount} 条日记`)
+    } catch (err: any) {
+        message.error(err?.message || '索引预检失败')
+    } finally {
+        isRebuilding.value = false
+    }
+}
+
+function confirmRebuildIndex() {
+    dialog.warning({
+        title: '重建索引',
+        content: '系统会先创建完整备份，再按 Markdown 文件重新生成 index.json。确定继续吗？',
+        positiveText: '重建索引',
+        negativeText: '取消',
+        onPositiveClick: rebuildIndex,
+    })
+}
+
+async function rebuildIndex() {
+    isRebuilding.value = true
+    try {
+        const res = await diaryApi.rebuildIndex(false)
+        storageStatus.value = res.data.status
+        message.success(`索引已重建：${res.data.entryCount} 条日记`)
+    } catch (err: any) {
+        message.error(err?.message || '索引重建失败')
+    } finally {
+        isRebuilding.value = false
+    }
+}
+
+async function loadTrash() {
+    isLoadingTrash.value = true
+    try {
+        const res = await diaryApi.trash()
+        trashFiles.value = res.data
+        message.success(res.data.length ? `回收站有 ${res.data.length} 条记录` : '回收站为空')
+    } catch (err: any) {
+        message.error(err?.message || '读取回收站失败')
+    } finally {
+        isLoadingTrash.value = false
+    }
+}
+
+function confirmRestoreLatest() {
+    const fileName = trashFiles.value[0]
+    if (!fileName) return
+    dialog.info({
+        title: '恢复最近删除',
+        content: `将恢复 ${fileName}，恢复前会自动备份当前状态。`,
+        positiveText: '恢复',
+        negativeText: '取消',
+        onPositiveClick: () => restoreTrash(fileName),
+    })
+}
+
+async function restoreTrash(fileName: string) {
+    isRestoring.value = true
+    try {
+        const res = await diaryApi.restoreTrash(fileName)
+        storageStatus.value = res.data.status
+        await loadTrash()
+        message.success(res.message || '日记已恢复')
+    } catch (err: any) {
+        message.error(err?.message || '恢复失败')
+    } finally {
+        isRestoring.value = false
     }
 }
 
