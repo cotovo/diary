@@ -1,0 +1,288 @@
+<template>
+    <div class="diary-header">
+
+        <!-- 日期 -->
+        <div class="date-wrapper" v-if="props.diary.dateObj">
+            <div class="date-time">
+                {{ props.diary.dateObj.dateFull }}  {{props.diary.dateObj.time}}
+            </div>
+            <div class="date-lunar">
+                {{lunarObject.IMonthCn}}{{lunarObject.IDayCn}}  {{props.diary.dateObj.weekday}}
+                <span
+                    v-if="Moment().diff(props.diary.date, 'days') > 0"
+                    class="date-diff"
+                >
+                    {{Moment().diff(props.diary.date, 'days')}}天前
+                </span>
+            </div>
+        </div>
+
+        <!-- 天气 -->
+        <div class="weather-wrapper">
+            <div class="weather">
+                <img v-if="props.diary.weather" :src="SVG_ICONS.weather_icons[`${props.diary.weather}_active`]"
+                     :alt="props.diary.weather">
+            </div>
+            <div class="temperatures">
+                <div class="temperature"
+                     v-if="props.diary.temperature">
+                    身处
+                    <span :class="['temperature-number', getTemperatureClassName(Number(props.diary.temperature))]">{{ props.diary.temperature }}</span> ℃
+                </div>
+                <div class="temperature"
+                     v-if="props.diary.temperature_outside">
+                    室外
+                    <span :class="['temperature-number', getTemperatureClassName(Number(props.diary.temperature_outside))]">{{ props.diary.temperature_outside }}</span> ℃
+                </div>
+            </div>
+        </div>
+
+        <!-- 类别 -->
+        <div class="category-wrapper">
+            <div class="detail-category" :style="categoryBgColor">
+                <span>{{ props.diary.categoryString }}</span>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script lang="ts" setup>
+import SVG_ICONS from "@/assets/icons/SVG_ICONS.ts";
+import {computed} from "vue";
+import {useStatisticStore} from "@/pinia/useStatisticStore.ts";
+import Moment from "moment";
+
+const props = defineProps({
+    isLoading: {
+        type: Boolean,
+        default: false
+    },
+    diary: {
+        type: Object,
+        default: {}
+    },
+    lunarObject: {
+        type: Object,
+        default: {}
+    },
+})
+
+const categoryBgColor = computed<string>( () => {
+    if (props.diary && props.diary.category){
+        return `background-color: ${useStatisticStore().getCategoryColor(props.diary.category)}`
+    } else {
+        return ''
+    }
+})
+
+function getTemperatureClassName(temperature: number): string{
+    if (temperature >= 35){
+        return 'temperature-35'
+    } else if (temperature < 35 && temperature >= 28){
+        return 'temperature-35-28'
+    } else if (temperature < 28 && temperature >= 22){
+        return 'temperature-28-22'
+    } else if (temperature < 22 && temperature >= 15) {
+        return 'temperature-22-15'
+    } else if (temperature < 15 && temperature >= 4) {
+        return 'temperature-15-4'
+    } else if (temperature < 4) {
+        return 'temperature-4'
+    } else {
+        return ''
+    }
+}
+</script>
+
+<style scoped lang="scss">
+@use "sass:color" as color;
+@use "../../scss/plugin" as *;
+
+.diary-header{
+    background-color: $bg-light;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .weather-wrapper{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .weather{
+            margin-right: 5px;
+            flex-grow: 1;
+            padding: 3px;
+            img{
+                height: 30px;
+                display: block;
+            }
+        }
+        .temperatures{
+            flex-shrink: 0;
+            font-size: $fz-small;
+            line-height: 1;
+            color: $text-title;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            .temperature{
+
+            }
+        }
+    }
+
+    .date-wrapper{
+        font-size: $fz-main;
+        line-height: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        .date-time{
+            font-weight: bold;
+        }
+        .date-lunar{
+            font-size: $fz-small;
+            .date-diff{
+                color: $text-label;
+                margin-left: 10px;
+            }
+        }
+    }
+    .category-wrapper{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .detail-category{
+            font-size: .8rem;
+            text-align: center;
+            margin: 3px 0;
+            padding: 5px 12px;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+    }
+}
+
+
+// PC
+@media (min-width: $grid-separate-width-big ) {
+    .diary-header{
+        background-color: $bg-light;
+        padding: 15px 50px;
+        display: flex;
+        justify-content: space-between;
+        border-radius: 10px;
+
+        .weather-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .weather {
+                margin-right: 5px;
+                flex-grow: 1;
+                padding: 3px;
+
+                img {
+                    height: 35px;
+                    display: block;
+                }
+            }
+
+            .temperatures {
+                gap: 3px;
+                flex-shrink: 0;
+                font-size: $fz-note;
+                color: $text-title;
+            }
+        }
+        .date-wrapper {
+            gap: 3px;
+            flex-shrink: 0;
+            color: $bg-main;
+
+            .date-time {
+                font-weight: bold;
+                font-size: $fz-title;
+            }
+
+            .date-lunar {
+                margin-top: 3px;
+                color: $text-subtitle;
+                font-size: $fz-note;
+            }
+        }
+        .category-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .detail-category {
+                font-size: .8rem;
+                text-align: center;
+                margin: 3px 0;
+                padding: 5px 12px;
+                color: white;
+                border-radius: 5px;
+            }
+        }
+    }
+}
+
+// IPAD
+@media (min-width: $grid-separate-width-md) and (max-width: $grid-separate-width-big) {
+    .diary-header{
+        margin: 0 0 30px;
+        padding: 10px 50px;
+        justify-content: space-between;
+        border-radius: $radius-mobile;
+
+        .weather-wrapper{
+            .weather{
+                margin-right: 15px;
+                img{}
+            }
+            .temperature{
+                margin-right: 15px;
+            }
+        }
+
+        .date-wrapper{
+            .date{}
+            .time{
+                margin-left: 20px;
+            }
+        }
+    }
+}
+
+// 暗色模式
+@media (prefers-color-scheme: dark) {
+    .diary-header {
+        background-color: color.adjust($dark-bg, $lightness: -5%);
+        color: $dark-text;
+        .date-wrapper {
+            color: $bg-main;
+            .date-time {
+                color: $dark-text-header-date;
+            }
+            .date-lunar {
+                color: $dark-text-header-lunar;
+                .date-diff{
+                    color: $dark-text-label;
+                }
+            }
+        }
+        .weather-wrapper{
+            .temperature{
+                color: $dark-text;
+            }
+        }
+    }
+}
+
+
+
+</style>

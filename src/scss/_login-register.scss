@@ -1,0 +1,422 @@
+@use "sass:color" as color;
+@use "variables" as *;
+@use "utility" as *;
+
+// Register
+
+// Chrome 自动填充会覆盖 input 背景色；用 inset box-shadow 铺满以匹配设计稿背景
+@mixin login-input-autofill($bg, $text-color, $focus-bg: $bg, $ring-color: $color-main) {
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px $bg inset !important;
+    -webkit-text-fill-color: $text-color !important;
+    caret-color: $text-color;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  &:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px $focus-bg inset, 0 0 0 2px $ring-color !important;
+  }
+}
+
+.body-login-bg {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: $bg-main;
+}
+
+.body-login {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 60px 25px;
+
+  .logo-wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+
+    .logo {
+      border-radius: 200px;
+      overflow: hidden;
+      height: 150px;
+      width: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      $timer: 0;
+      border: 1px solid $color-main;
+      transition: all 0.3s;
+      box-shadow: 3px*$timer 3px*$timer 0 color.adjust(black, $alpha: -0.6),
+                      -5px*$timer -8px*$timer 3px*$timer color.adjust($color-main, $alpha: -0.3),
+                      -15px*$timer 13px*$timer 4px*$timer color.adjust($green, $alpha: -0.3),
+                      -45px*$timer 8px*$timer 10px*$timer color.adjust($cyan, $alpha: -0.5),
+                      15px*$timer -15px*$timer 10px*$timer color.adjust($blue, $alpha: -0.1),
+                      65px*$timer 65px*$timer 30px*$timer color.adjust($yellow, $alpha: -0.6),
+                      20px*$timer 45px*$timer 15px*$timer color.adjust($magenta, $alpha: -0.2),
+                      -20px*$timer -45px*$timer 15px*$timer color.adjust($red, $alpha: -0.6),
+                      -105px*$timer 38px*$timer 20px*$timer color.adjust($green, $alpha: -0.5),
+                      15px*$timer -105px*$timer 10px*$timer color.adjust($blue, $alpha: -0.6),
+                      140px*$timer 45px*$timer 15px*$timer color.adjust($magenta, $alpha: -0.6),
+                      -20px*$timer -145px*$timer 40px*$timer color.adjust($yellow, $alpha: -0.6),
+                      60px*$timer -65px*$timer 40px*$timer color.adjust($magenta, $alpha: -0.2),;
+      &.valid{
+        $timer: 0.15;
+        transition: all 0.3s;
+        box-shadow: 3px*$timer 3px*$timer 0 color.adjust(black, $alpha: -0.6),
+                -5px*$timer -8px*$timer 3px*$timer color.adjust($color-main, $alpha: -0.3),
+                -15px*$timer 13px*$timer 4px*$timer color.adjust($green, $alpha: -0.3),
+                -45px*$timer 8px*$timer 10px*$timer color.adjust($cyan, $alpha: -0.5),
+                15px*$timer -15px*$timer 10px*$timer color.adjust($blue, $alpha: -0.1),
+                65px*$timer 65px*$timer 30px*$timer color.adjust($yellow, $alpha: -0.6),
+                20px*$timer 45px*$timer 15px*$timer color.adjust($magenta, $alpha: -0.2),
+                -20px*$timer -45px*$timer 15px*$timer color.adjust($red, $alpha: -0.6),
+                -105px*$timer 38px*$timer 20px*$timer color.adjust($green, $alpha: -0.5),
+                15px*$timer -105px*$timer 10px*$timer color.adjust($blue, $alpha: -0.6),
+                140px*$timer 45px*$timer 15px*$timer color.adjust($magenta, $alpha: -0.6),
+                -20px*$timer -145px*$timer 40px*$timer color.adjust($yellow, $alpha: -0.6),
+                60px*$timer -65px*$timer 40px*$timer color.adjust($magenta, $alpha: -0.2),;
+      }
+      img {
+        width: 100%;
+        display: block;
+        margin: 0 auto;
+      }
+    }
+    .project-name {
+      margin-top: 20px;
+      text-align: center;
+      color: $color-main;
+      font-size: $fz-title;
+    }
+    .desc{
+      margin-top: 20px;
+      text-align: center;
+      color: $color-main;
+      font-size: $fz-title;
+    }
+  }
+
+  .footer {
+    padding: 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+
+    &.center{
+      justify-content: center;
+    }
+
+    > * {
+      cursor: pointer;
+      font-size: $fz-note;
+      color: $text-label;
+
+      &:hover, &:active {
+        color: white;
+      }
+    }
+
+    &.flex-start {
+      justify-content: flex-start;
+    }
+
+    &.flex-end {
+      justify-content: flex-end;
+    }
+  }
+}
+
+.input-group {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    line-height: 200%;
+    font-size: $fz-note;
+    color: $bg-light;
+  }
+
+  input {
+    background-color: $bg-menu;
+    width: 100%;
+    border-radius: $radius-mobile;
+    display: block;
+    line-height: 1.5;
+    padding: 8px 15px;
+    font-size: $fz-title;
+    color: white;
+    font-weight: bold;
+    transition: all .5s;
+
+    &:focus {
+      background-color: $bg-menu;
+      transition: all .5s;
+      box-shadow: 0 0 0 2px $color-main;
+    }
+
+    @include login-input-autofill($bg-menu, white);
+
+    &[disabled] {
+      cursor: not-allowed;
+      background-color: transparent;
+      border: 1px solid color.adjust($color-main, $alpha: -0.8);
+    }
+  }
+
+  .password-field{
+    position: relative;
+    input{
+      padding-right: 64px;
+    }
+    button{
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      min-height: 32px;
+      border: 0;
+      border-radius: $radius-mobile;
+      padding: 0 8px;
+      background-color: transparent;
+      color: $text-label;
+      cursor: pointer;
+      &:hover{
+        color: $color-main;
+        background-color: color.adjust(white, $alpha: -0.92);
+      }
+    }
+  }
+
+  textarea {
+    background-color: $bg-menu;
+    width: 100%;
+    border-radius: $radius-mobile;
+    display: block;
+    line-height: 1.5;
+    padding: 8px 15px;
+    font-size: $fz-title;
+    color: white;
+    font-weight: bold;
+    transition: all .5s;
+
+    &:focus {
+      background-color: $bg-menu;
+      transition: all .5s;
+      box-shadow: 0 0 0 2px $color-main;
+    }
+
+    &[disabled] {
+      cursor: not-allowed;
+      background-color: transparent;
+      border: 1px solid color.adjust($color-main, $alpha: -0.8);
+    }
+  }
+
+  &.white {
+    label {
+      color: $text-content;
+    }
+
+    input {
+      background-color: $bg-light;
+      color: $text-content;
+
+      &:focus {
+        background-color: white;
+        box-shadow: 0 0 0 2px $color-main;
+      }
+
+      @include login-input-autofill($bg-light, $text-content, white);
+    }
+
+    textarea {
+      background-color: $bg-light;
+      color: $text-content;
+
+      &:focus {
+        background-color: white;
+        box-shadow: 0 0 0 2px $color-main;
+      }
+    }
+  }
+}
+
+.btn {
+  border: 1px solid transparent;
+  padding: 8px 15px;
+  text-align: center;
+  width: 100%;
+  display: block;
+  font-weight: bold;
+  font-size: $fz-title;
+  cursor: pointer;
+  border-radius: $radius-mobile;
+
+  &:active {
+    transform: translateY(2px);
+  }
+
+  @extend .btn-like;
+}
+
+.btn-active {
+  color: $bg-main;
+  background-color: $color-main;
+
+  &:hover {
+    background-color: color.adjust($color-main, $lightness: -5%);
+  }
+}
+
+.btn-light {
+  font-weight: normal;
+  border-color: $color-border;
+  color: $text-content;
+  background-color: white;
+
+  &:hover {
+    background-color: color.adjust(white, $lightness: -1%);
+  }
+}
+
+
+.btn-inactive {
+  color: $gray;
+  border: 1px solid color.adjust(white, $alpha: -0.8);
+  background-color: transparent;
+
+  &:hover {
+    border: 1px solid color.adjust(black, $alpha: -0.8);
+    background-color: color.adjust(black, $alpha: -0.9);
+  }
+  &:disabled{
+    cursor: not-allowed;
+    opacity: 0.65;
+    transform: none;
+  }
+}
+
+
+.link-btn {
+  text-align: center;
+
+  a {
+    font-size: $fz-small;
+    color: $color-main;
+  }
+
+}
+
+
+// PC
+@media (min-width: $grid-separate-width-big) {
+  .body-login-bg {
+    align-items: center;
+  }
+  .body-login {
+    padding-bottom: 80px; // 使居中时登录面板往上一点
+    width: $menu-panel-big;
+    //margin-left: auto;
+    //margin-right: auto;
+    .logo-wrapper {
+      padding: 0 0 30px;
+    }
+  }
+}
+
+// PC & IPAD
+@media (min-width: $grid-separate-width-md) and (max-width: $grid-separate-width-big) {
+  .body-login-bg {
+    align-items: center;
+  }
+  .body-login {
+    padding-bottom: 80px;
+    padding-top: 0;
+    width: $menu-panel-big;
+    margin-left: auto;
+    margin-right: auto;
+
+    .logo-wrapper {
+      padding: 0 0 30px;
+    }
+  }
+}
+
+
+@media (prefers-color-scheme: dark) {
+  // LOGIN AND REGISTER
+  .body-login-bg {
+    background-color: $dark-bg-nav;
+
+    .input-group {
+      margin-bottom: 15px;
+
+      label {
+        display: block;
+        line-height: 200%;
+        font-size: $fz-note;
+        color: $bg-light;
+      }
+
+      input {
+        background-color: $dark-bg;
+
+        &:focus {
+          background-color: color.adjust($dark-bg, $lightness: 3%);
+        }
+
+        @include login-input-autofill($dark-bg, white, color.adjust($dark-bg, $lightness: 3%));
+      }
+
+      textarea {
+        background-color: $dark-bg;
+
+        &:focus {
+          background-color: color.adjust($dark-bg, $lightness: 3%);
+        }
+      }
+    }
+  }
+  .btn-light {
+    border-color: $dark-border-active;
+    color: $dark-text;
+    background-color: $dark-bg;
+
+    &:hover {
+      background-color: color.adjust($dark-bg, $lightness: -5%);
+    }
+  }
+
+  .input-group {
+    &.white {
+      label {
+        color: $bg-light;
+      }
+
+      input {
+        background-color: $bg-menu;
+        font-size: $fz-title;
+        color: white;
+
+        &:focus {
+          background-color: $bg-menu;
+        }
+
+        @include login-input-autofill($bg-menu, white);
+      }
+
+      textarea {
+        background-color: $bg-menu;
+        font-size: $fz-title;
+        color: white;
+
+        &:focus {
+          background-color: $bg-menu;
+        }
+      }
+    }
+  }
+}

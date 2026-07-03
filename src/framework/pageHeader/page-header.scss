@@ -1,0 +1,37 @@
+@use "sass:color" as color;
+@use "../../scss/plugin" as *;
+
+.page-header{
+  z-index: $z-header;
+  position: sticky;
+  top: 0;
+  height: $height-navbar;
+  background-color: $bg-main;
+  display: flex;
+  color: white;
+  padding-right: 10px;
+  justify-content: space-between;
+  align-items: center;
+  .page-title{
+    flex-shrink: 0;
+    font-size: $fz-title;
+    font-weight: bold;
+    text-align: left;
+  }
+  .page-subtitle{
+    margin-left: 10px;
+    color: color.adjust(white, $alpha: -0.6);
+    flex-grow: 1;
+    font-size: $fz-main;
+    text-align: left;
+  }
+  .page-back-btn{
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  // Page Header
+  .page-header{
+    background-color: $dark-bg-nav;
+  }
+}

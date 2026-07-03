@@ -1,0 +1,124 @@
+@use "variables" as *;
+@use "utility" as *;
+
+// MENU
+$menu-category-list-item-height: 40px;
+
+.menu-panel{
+  z-index: 10;
+  border-radius: $radius-whole-ui - 1px;  // 避免当与 list 重叠时，menu 在上， list 在下，会出现白边的情况
+  overflow: hidden;
+  position: fixed;
+  top: $height-navbar;
+  left: 0;
+  width: 100%;
+  background-color: $bg-menu;
+}
+
+.menu{
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+}
+
+.menu-list{
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+  list-style-type: none;
+}
+
+.menu-btn {
+  flex-shrink: 0;
+  position: relative;
+  display: block;
+  text-align: center;
+  width: 45%;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: black;
+  line-height: $menu-category-list-item-height;
+  border: 1px solid $color-main;
+  background-color: $color-main;
+  border-radius: 5px;
+  @extend .btn-like;
+}
+
+
+
+
+// MENU CATEGORY
+.menu-category-list{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-flow: row wrap;
+}
+.menu-category-item {
+  @extend .btn-like;
+  flex-shrink: 0;
+  position: relative;
+  display: block;
+  text-align: center;
+  width: 31%;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: white;
+  line-height: $menu-category-list-item-height;
+  border-radius: 5px;
+  border: 1px dashed $gray;
+  &.menu-category-shared{
+    background-color: transparent;
+    &.active{
+      background-color: white;
+      color: $text-title;
+      border: 1px solid white;
+    }
+  }
+  .count{
+    color: white;
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    font-size: 10px;
+    line-height: 1;
+  }
+}
+
+.category-operations-container{
+  padding-top: 20px;
+  border-top: 1px solid $bg-main;
+}
+
+
+// PC
+@media (min-width: $grid-separate-width-big) {
+  .menu-panel {
+    width: $menu-panel-big;
+  }
+  .menu-category-item {
+  }
+}
+
+// PC & IPAD
+@media (min-width: $grid-separate-width-md) and (max-width: $grid-separate-width-big) {
+  .menu-panel{
+    width: $menu-panel-sm;
+  }
+  .user-profile{
+    padding: 30px 50px;
+  }
+
+  .menu-category-item {
+    width: 40%;
+  }
+}
+
+@media (max-width: $grid-separate-width-md) {
+  .user-profile{
+    padding: 30px 50px 50px;
+  }
+  .menu-list{
+  }
+}

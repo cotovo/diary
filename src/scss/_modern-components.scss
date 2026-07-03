@@ -1,0 +1,173 @@
+.modern-page {
+    min-height: 100dvh;
+    padding: 32px;
+    background:
+        linear-gradient(180deg, rgba(246, 248, 244, 0.96), rgba(239, 243, 238, 0.96));
+    color: #17211d;
+}
+
+.modern-page-header {
+    width: min(1080px, 100%);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+
+    h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.25;
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+}
+
+.modern-page-eyebrow {
+    margin: 0 0 8px;
+    color: #587066;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.modern-page-description {
+    max-width: 620px;
+    margin: 10px 0 0;
+    color: #596961;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.modern-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modern-page-content {
+    width: min(1080px, 100%);
+    margin: 0 auto;
+    display: grid;
+    gap: 16px;
+}
+
+.modern-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.modern-panel {
+    grid-column: span 12;
+    border: 1px solid rgba(77, 97, 88, 0.14);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 12px 36px rgba(44, 58, 51, 0.08);
+    overflow: hidden;
+}
+
+.modern-panel-header {
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid rgba(77, 97, 88, 0.1);
+
+    h2 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    p {
+        margin: 6px 0 0;
+        color: #64746c;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+
+.modern-panel-body {
+    padding: 18px 20px 20px;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.metric-tile {
+    min-height: 92px;
+    padding: 14px;
+    border: 1px solid rgba(77, 97, 88, 0.12);
+    border-radius: 8px;
+    background: #fbfcfa;
+}
+
+.metric-tile-label {
+    color: #66776f;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.metric-tile-value {
+    margin-top: 8px;
+    color: #17211d;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.metric-tile-caption {
+    margin-top: 8px;
+    color: #7a887f;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.modern-empty-state {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+    text-align: center;
+    color: #52655c;
+
+    h3 {
+        margin: 0;
+        color: #1c2823;
+        font-size: 16px;
+    }
+
+    p {
+        max-width: 420px;
+        margin: 6px 0 0;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+
+.modern-empty-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+@media (max-width: 760px) {
+    .modern-page {
+        padding: 20px 14px;
+    }
+
+    .modern-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

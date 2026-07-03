@@ -1,0 +1,86 @@
+@use "sass:color" as color;
+@use "../../scss/plugin" as *;
+
+.file-list-item{
+  margin-left: 20px;
+  margin-bottom: 20px;
+  padding: 12px 20px;
+  background-color: $bg-light;
+  border-radius: $radius-pc;
+  display: flex;
+  align-items: center;
+  font-size: $fz-small;
+}
+
+.id{
+  flex-shrink: 0;
+  font-size: $fz-title;
+  border-radius: 100px;
+  text-align: center;
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
+}
+
+.file-meta{
+  width: 80px;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  flex-flow: row wrap;
+}
+
+
+.file-info{
+  min-width: 150px;
+  color: $text-label;
+  margin-left: 10px;
+  .name{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.5;
+    color: $text-title;
+    font-size: $fz-main;
+    font-weight: bold;
+  }
+  .size{
+    font-family: "JetBrainsMonoDiary", "SF UI Display", "PingFang SC", "Microsoft Yahei UI", "Microsoft Yahei", "Helvetica", sans-serif;
+    color: $text-subtitle;
+  }
+  .description{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: $text-subtitle;
+  }
+  .file-type{
+    color: $blue;
+    &.image{
+      color: $magenta;
+    }
+  }
+  .date{}
+  .path{}
+  .owner{}
+}
+
+
+// MOBILE
+@media (max-width: $grid-separate-width-sm) {
+  .file-list-item{
+    margin-left: 0;
+    width: 100%;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+}
+
+// DARK
+@media (prefers-color-scheme: dark) {
+  .file-list-item{
+    background: linear-gradient(white, color.adjust(white, $lightness: -20%));
+  }
+}
+

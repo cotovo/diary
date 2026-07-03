@@ -1,0 +1,209 @@
+@use "sass:color" as color;
+@use "../../scss/plugin" as *;
+
+$bank-card-gap: 30px;
+$card-bgs: (
+        "green"      : (#24b73d, #33c891),   // 农业
+        "red"        : (#ff7575, #fd9898),   // 工商
+        "blue"       : (#209bfa, #93ddee),   // 建行
+        "white"      : (#abab97, #dadada),   // 招商
+        "zhaoshang"  : (#a2d96d, #69adff, #c060fc, #e8b28c),   // 招商
+        "jiaotong"   : (#86bafd, #64e89a ),   // 交通
+);
+
+@each $name, $colors in $card-bgs {
+  .bank-bg-#{$name}{
+    background: linear-gradient(-15deg, $colors);
+  }
+}
+
+.bankcard{
+  display: flex;
+  flex-flow: column nowrap;
+  border-top: 1px solid color.adjust(white, $alpha: -0.5);
+  border-left: 1px solid color.adjust(white, $alpha: -0.5);
+  overflow: hidden;
+  border-radius: $radius-pc;
+  width: 430px;
+  min-height: 200px;
+  color: $text-title;
+  position: relative;
+  box-shadow: 3px 3px 0px color.adjust(black, $alpha: -0.5);
+  background-color: color.adjust(white, $alpha: -0.4);
+  margin-bottom: $bank-card-gap;
+  margin-right: $bank-card-gap;
+  transition: all 0.3s;
+  &:hover{
+    //transform: translateX();
+    transform: translateY(-5px) translateX(-1px);
+    transition: all 0.2s;
+    box-shadow: 15px 15px 0px color.adjust(black, $alpha: -0.5);
+    .bankcard-index {
+      color: white;
+      opacity: 1;
+    }
+    .bankcard-no{
+
+    }
+  }
+  .bankcard-index {
+    color: black;
+    font-family: "JetBrainsMonoDiary";
+    font-size: $fz-small;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    opacity: 0.5;
+  }
+  .bankcard-note{
+    flex-shrink: 0;
+    font-size: 12px;
+    text-shadow: -1px -1px 1px color.adjust(white, $alpha: -0.5), 1px 1px 0 color.adjust(black, $alpha: -0.7);
+  }
+  .copy-btn{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    img{
+      display: block;
+      width: 30px;
+    }
+  }
+}
+
+.bankcard-upper{
+  padding: 20px 15px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  .bankcard-logo{
+    height: 60px;
+    width: 60px;
+    border-radius: 100px;
+    flex-shrink: 0;
+    img {
+      display: block;
+      width: 100%;
+    }
+  }
+  .bankcard-title{
+    display: flex;
+    justify-content: flex-start;
+    font-size: $fz-bankcard-header;
+    .bankcard-name{
+      font-weight: bold;
+      flex-shrink: 0;
+      color: white;
+      text-shadow: 1px 0 2px color.adjust(black, $alpha: -0.5);
+      @extend .btn-like;
+    }
+    .bankcard-type{
+      margin-left: 30px;
+      flex-shrink: 0;
+      color: white;
+      text-shadow: 1px 1px 0 color.adjust(black, $alpha: -0.7);
+    }
+  }
+  .bankcard-main-info{
+    padding-left: 15px;
+    flex-grow: 1;
+    .bankcard-no{
+      flex-shrink: 0;
+      font-family: 'ImpactDiary';
+      letter-spacing: 1px;
+      font-size: 26px;
+      color: white;
+      text-shadow: 0 0 2px color.adjust(black, $alpha: -0.5);
+      @extend .btn-like;
+    }
+  }
+}
+
+
+
+.bankcard-detail-list{
+  font-family: "JetBrainsMonoDiary", "SF UI Display", "PingFang SC", "Microsoft Yahei UI", "Microsoft Yahei", "Helvetica", sans-serif;
+  flex-shrink: 0;
+  flex-grow: 1;
+  border-top: 1px solid color.adjust(white, $alpha: -0.9);
+  overflow-y: auto;
+  padding: 10px 30px 40px;
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: column nowrap;
+  font-size: $fz-small;
+  background-color: color.adjust(white, $alpha: -0.4);
+  transition: all 0.5s;
+  animation: card-move-up 0.5s;
+  animation-fill-mode: forwards;   // 止于结束状态，不会乱跳
+}
+
+
+@keyframes card-move-up {
+  from {
+    margin-top: 100px;
+  }
+  to {
+    margin-top: 20px;
+  }
+}
+
+
+.bankcard-detail-list-item{
+  padding: 2px 0;
+  display: flex;
+  line-height: 1.2;
+  justify-content: space-between;
+  color: $text-content;
+  .label{
+    width: 5rem;
+  }
+  .value{
+    padding-left: 20px;
+    flex-grow: 1;
+    text-align: right;
+  }
+}
+
+
+// mobile
+@media (max-width: $grid-separate-width-sm) {
+  .bankcard{
+    width: 100%;
+    margin-bottom: 15px;
+    margin-right: 0;
+    &:hover{
+      transform: translateY(-5px) translateX(-1px);
+      transition: all 0.2s;
+      box-shadow: 5px 5px 0px color.adjust(black, $alpha: -0.5);
+    }
+    // upper
+    .bankcard-upper{
+      padding: 10px 15px;
+      .bankcard-logo {
+        height: 42px;
+        width: 42px;
+      }
+      .bankcard-main-info{
+        padding-left: 15px;
+        .bankcard-title{
+          font-size: 20px;
+        }
+        .bankcard-no{
+          font-size: 22px;
+        }
+      }
+    }
+    .bankcard-no {
+      font-size: 22px;
+    }
+    // down
+    .bankcard-detail-list{
+      padding: 10px 20px;
+      .bankcard-detail-list-item{
+        padding: 3px 0;
+      }
+    }
+  }
+}

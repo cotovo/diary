@@ -1,0 +1,211 @@
+@use "../../scss/plugin" as *;
+
+.todo-list{
+
+}
+
+.todo-list-item{
+  cursor: grab;
+  border-radius: 3px;
+  padding-left: 15px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  &.editing{
+    cursor: default;
+    background-color: $bg-light;
+    .item-actions{
+      opacity: 1;
+    }
+  }
+  &.done{
+    .content{
+      color: $text-label;
+      text-decoration: line-through;
+    }
+  }
+  .checkbox-wrapper{
+    margin-top: 7px;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  .item-actions{
+    display: flex;
+    flex-flow: row nowrap;
+    flex-shrink: 0;
+    opacity: 0;
+    margin-top: 2px;
+    transition: opacity 0.15s;
+  }
+
+  .content-wrapper{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    padding: 7px 7px;
+    flex: 1;
+    min-width: 0;
+    border-bottom: 1px solid $color-border-light;
+    .content{
+      margin-right: 5px;
+      line-height: 1.3;
+      width: 100%;
+      outline: none;
+      min-height: 1.3em;
+      &:empty::before{
+        content: attr(data-placeholder);
+        color: $text-label;
+        pointer-events: none;
+      }
+    }
+    .note{
+      margin-right: 5px;
+      margin-top: 4px;
+      line-height: 1.3;
+      color: $text-label;
+      font-size: $fz-small;
+      width: 100%;
+      outline: none;
+      min-height: 1.3em;
+      &:empty::before{
+        content: attr(data-placeholder);
+        color: $text-label;
+        pointer-events: none;
+      }
+    }
+  }
+
+  &:hover{
+    background-color: $bg-light;
+    .content-wrapper{
+      border-bottom-color: transparent;
+    }
+    .item-actions{
+      opacity: 1;
+    }
+  }
+}
+
+.todo-add-row{
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding-left: 15px;
+  margin-top: 4px;
+  .checkbox-wrapper{
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  .add-input{
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: 7px;
+    outline: none;
+    font-size: inherit;
+    line-height: 1.3;
+    color: inherit;
+    &::placeholder{
+      color: $text-label;
+    }
+  }
+}
+
+$checkbox-size: 20px;
+
+div.checkbox{
+  display: block;
+  height: $checkbox-size;
+  width: $checkbox-size;
+  border-radius: 20px;
+  border: 1px solid $text-label;
+  background-color: white;
+  cursor: pointer;
+  @extend .btn-like;
+  &:hover{
+    border-color: var(--todo-color, $green);
+  }
+}
+
+div.checkbox.checked{
+  display: block;
+  height: $checkbox-size;
+  width: $checkbox-size;
+  border-radius: 20px;
+  border: 1px solid var(--todo-color, $green);
+  position: relative;
+  &::after{
+    content: '';
+    display: block;
+    position: absolute;
+    width: $checkbox-size - 6;
+    height: $checkbox-size - 6;
+    border-radius: 20px;
+    top: 2px;
+    left: 2px;
+    background-color: var(--todo-color, $green);
+  }
+}
+
+div.checkbox.add-placeholder{
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+
+// MOBILE
+@media (max-width: $grid-separate-width-sm) {
+  .todo-list-item{
+    padding-left: 10px;
+    .item-actions{
+      opacity: 1;
+    }
+  }
+  .todo-add-row{
+    padding-left: 10px;
+  }
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .todo-list-item{
+    &.done{
+      .content{
+        color: $text-label;
+      }
+    }
+    .content-wrapper{
+      border-bottom: 1px solid $dark-border;
+    }
+    .content{
+      color: $dark-text-title;
+    }
+    .note{
+      color: $dark-text-subtitle;
+    }
+
+    &:hover{
+      background-color: $dark-bg-nav;
+    }
+    &.editing{
+      background-color: $dark-bg-nav;
+    }
+  }
+
+  .todo-add-row{
+    .add-input{
+      color: $dark-text-title;
+      &::placeholder{
+        color: $dark-text-subtitle;
+      }
+    }
+  }
+
+  div.checkbox {
+    background-color: $dark-bg;
+  }
+}

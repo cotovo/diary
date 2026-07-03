@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 标题日记 - 单人文件版
 
-## Getting Started
+这个项目基于 [KyleBing/diary](https://github.com/KyleBing/diary) 重做为单人自用版本：保留原来的 Vue3/Vite 写作界面和主要日记体验，去掉注册、找回密码、邀请码、安装向导和多用户管理流程。
 
-First, run the development server:
+当前版本内置一个轻量 Node 服务，不再依赖原 `portal` 后端或数据库。日记会保存为 Markdown 文件，索引保存为 JSON：
 
-```bash
+- `data/entries/YYYY/MM/{id}.md`
+- `data/index.json`
+- `data/config.json`
+- `data/backups/`
+
+## 本地运行
+
+```powershell
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 [http://127.0.0.1:1021](http://127.0.0.1:1021)。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+开发默认登录密码：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 密码：`diary`
 
-## Learn More
+这是本地开发兜底密码，公网部署前必须改掉。
 
-To learn more about Next.js, take a look at the following resources:
+## 生产运行
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```powershell
+npm run build
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+生产服务默认监听 `3000`，会同时提供前端静态文件和 API。可以放在 Nginx/Caddy 后面做 HTTPS 反向代理。
 
-## Deploy on Vercel
+## 配置
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+复制 `.env.example` 为 `.env`，按需配置：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+ADMIN_PASSWORD_HASH=
+SESSION_SECRET=replace-with-a-long-random-secret
+DIARY_DATA_DIR=./data
+PORT=3000
+```
+
+生成密码哈希：
+
+```powershell
+npm run hash-password -- "你的新密码"
+```
+
+把输出填入 `ADMIN_PASSWORD_HASH`。如果安装了 `argon2` 依赖会生成 Argon2id 哈希；否则使用 Node 内置 scrypt 哈希。公网部署建议安装并使用 Argon2id。
+
+## 已简化
+
+- 只支持一个用户。
+- 登录只需要管理员密码；`ADMIN_EMAIL` 仅保留为内部用户资料和旧接口兼容字段。
+- 注册、邀请码、找回密码、安装数据库配置等多用户流程已移除入口。
+- 日记、日历、列表、瀑布流、统计、导出等核心写作功能保留。
+- 账单、银行卡、文件等原项目周边功能尽量兼容；没有独立数据源时返回空数据或从特殊日记内容读取。
+
+## 授权
+
+原项目为 GPL-3.0，本仓库保留 `LICENSE` 与原作者信息。感谢 KyleBing 的优秀日记项目。

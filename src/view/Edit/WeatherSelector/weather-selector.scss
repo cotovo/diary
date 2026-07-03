@@ -1,0 +1,72 @@
+@use "../../../scss/plugin" as *;
+
+$height-weather: 30px;
+
+.weather-selector{
+  border: 1px solid $color-border;
+  border-radius: $radius-mobile;
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+  padding: 20px;
+  background-color: white;
+  .weather{
+    border-radius: 50px;
+    @extend .unselectable;
+    padding: 7px;
+    display: block;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0;
+    &:hover{
+      background-color: $bg-light;
+    }
+    img{
+      @extend .unselectable;
+      margin: 0 auto;
+      height: $height-weather;
+      width: $height-weather;
+      display: block;
+    }
+  }
+}
+
+
+
+// MAX
+@media (min-width: $grid-separate-width-big){
+  .weather-selector {
+    border-radius: $radius-pc;
+    .weather{
+    }
+  }
+}
+
+// md
+@media (min-width: $grid-separate-width-md) and (max-width: $grid-separate-width-big) {
+  .weather-selector {
+    border-radius: $radius-pc;
+    .weather{
+    }
+  }
+}
+
+// sm
+@media (max-width: $grid-separate-width-md) {
+  .weather-selector {
+    border-radius: $radius-pc;
+  }
+}
+
+
+// DARK
+@media (prefers-color-scheme: dark) {
+  .weather-selector{
+    border-color: $dark-border;
+    background-color: $dark-bg-dark;
+    border-bottom-color: $dark-border;
+    .weather:hover{
+      background-color: $dark-bg;
+    }
+  }
+}

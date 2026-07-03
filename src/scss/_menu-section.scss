@@ -1,0 +1,42 @@
+@use "plugin" as *;
+
+// Menu Section
+.menu-section{
+  padding: 0 0 30px;
+  border-bottom: -1px solid $color-border-menu;
+  .menu-section-title{
+    font-size: $fz-title;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+  }
+  .menu-section-subtitle{
+    font-size: $fz-small;
+    color: $text-menu-second;
+    margin-bottom: 15px;
+  }
+  .menu-section-content{
+    .btn-list{
+      display: flex;
+      justify-content: flex-start;
+      flex-flow: row wrap;
+      .btn{
+        margin-bottom: 10px;
+        width: 48%;
+        margin-right: 4%;
+        &:nth-child(2n){
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+.desc{
+  font-size: $fz-small;
+  color: $text-menu-second;
+}
+
+@media (max-width: $grid-separate-width-sm) {
+  .menu-section {}
+}

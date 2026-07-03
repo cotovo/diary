@@ -1,0 +1,162 @@
+@use "../../../scss/plugin" as *;
+.statistic-info{
+  flex-shrink: 0;
+}
+
+.statistic-charts{
+  width: 100%;
+  color: $color-main;
+}
+
+.statistic-group{
+  justify-content: space-around;
+  align-items: center;
+  display: flex;
+}
+
+$show-value-dash: true;
+
+.info-list-group{
+  display: flex;
+  justify-content: space-between;
+  flex-flow: row nowrap;
+  > * {
+    width: 50%;
+  }
+}
+.info-list{
+  width: 150px;
+  flex-shrink: 0;
+  margin-right: 5%;
+  height: 300px;
+  overflow-y: auto;
+  font-size: $fz-list-content;
+  margin-bottom: 15px;
+  &:last-child{
+    margin-bottom: 0;
+  }
+  .info-list-item{
+    position: relative;
+    justify-content: space-between;
+    align-items: flex-start;
+    display: flex;
+    line-height: 1.5;
+    &:hover{
+      &:after{
+        border-bottom-color: $orange;
+      }
+    }
+    &.invalid{
+      @if $show-value-dash {
+        &::after{
+          content: none;
+        }
+      }
+      .key{
+        color: $text-label;
+      }
+      .value{
+        color: $text-label;
+        &:before{
+          content: '--';
+        }
+      }
+    }
+    .key{
+      @if $show-value-dash {
+        padding-right: 20px;
+        z-index: 10;
+        background-color: $bg-light;
+      }
+      color: $text-content;
+      flex-shrink: 0;
+    }
+    .value-group{
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .unit{
+      margin-left: 3px;
+      font-size: 0.7rem;
+      font-weight: normal;
+    }
+
+    .value{
+      @if $show-value-dash {
+        padding-left: 20px;
+        padding-right: 10px;
+        z-index: 10;
+        background-color: $bg-light;
+      }
+      font-weight: bold;
+      color: $orange;
+      text-align: right;
+      letter-spacing: 0.5px;
+    }
+    @if $show-value-dash {
+      &::after{
+        z-index: 1;
+        content: '';
+        top: 50%;
+        width: 100%;
+        display: block;
+        border-bottom: 1px dashed $color-border-highlight;
+        position: absolute;
+      }
+    }
+  }
+}
+
+
+
+@media (min-width: $grid-separate-width-big) and (max-width: $grid-separate-width-max) {
+  .info-list-group{
+    flex-flow: column nowrap;
+    & > *{
+      width: 100%;
+    }
+  }
+}
+
+// Mobile
+@media (max-width: $grid-separate-width-sm) {
+  .statistic-group{
+    display: flex;
+    flex-flow: column nowrap;
+  }
+  .info-list{
+    width: 100%;
+    margin: 0;
+    height: auto;
+    display: flex;
+    flex-flow: row wrap;
+    .info-list-item{
+      width: 50%;
+    }
+  }
+}
+
+// DARK
+
+
+// DARK
+@media (prefers-color-scheme: dark) {
+  .info-list{
+    .key{
+      color: $dark-text!important;
+      background-color: $dark-bg!important;
+    }
+    .unit{
+
+    }
+    .value{
+      background-color: $dark-bg!important;
+    }
+    .info-list-item{
+      &::after{
+        border-bottom: 1px dashed $dark-border-active !important;
+      }
+    }
+  }
+}
+

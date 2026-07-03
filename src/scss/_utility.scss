@@ -1,0 +1,26 @@
+@use "variables" as *;
+
+.unselectable{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.btn-like{
+  white-space: nowrap;
+  @extend .unselectable;
+  cursor: pointer;
+  &:active{
+    transform: translateY(2px);
+  }
+}
+
+
+
+@media (max-width: $grid-separate-width-sm) {
+  .hide-in-mobile{
+    display: none;
+  }
+}
+

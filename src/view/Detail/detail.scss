@@ -1,0 +1,191 @@
+@use "sass:color" as color;
+@use "../../scss/plugin" as *;
+
+.diary-detail{
+  background-color: white;
+  margin: 0 auto;
+}
+
+.diary-title{
+  position: relative;
+  margin: 0 20px;
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  &:hover{
+    .toolbar{
+      transition: all 0.3s;
+      opacity: 1;
+    }
+  }
+  h2{
+    font-size: $fz-title;
+    font-weight: bold;
+    word-break: break-all;
+  }
+
+  .toolbar{
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    transition: all 0.3s;
+    opacity: 0;
+  }
+
+  h2.mobile-copyable{
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+.diary-content{
+  border-top: 2px dashed $color-border;
+  position: relative;
+  color: $bg-main;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin: 0 20px;
+  padding: 20px 0 60px;
+  overflow-y: auto;
+  font-family: "JetBrainsMonoDiary", "SF UI Display", "PingFang SC", "Microsoft Yahei UI", "Microsoft Yahei", "Helvetica", sans-serif;
+  &:hover{
+    .toolbar{
+      transition: all 0.3s;
+      opacity: 1;
+    }
+  }
+  .toolbar{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
+    align-items: flex-end;
+    transition: all 0.3s;
+    opacity: 0;
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    > * {
+      margin-bottom: 10px;
+    }
+  }
+  .content{
+    white-space: pre-wrap;
+    p{
+      margin-bottom: 0;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+    .code{
+      font-size: 12px;
+      line-height: 1.3;
+    }
+  }
+}
+
+.clipboard-btn{
+  line-height: 1;
+  font-size: $fz-main;
+  padding: 5px 10px;
+  border-radius: 30px;
+  background-color: color.adjust(white, $alpha: -0.5);
+  border: 1px solid $color-border;
+  &:hover{
+    background-color: $bg-light;
+    color: $color-border-menu;
+    border-color: $color-border-menu;
+  }
+  @extend .btn-like;
+}
+
+
+
+// PC
+@media (min-width: $grid-separate-width-big){
+  .diary-detail{
+    padding: 40px 10%;
+    margin: 0 auto;
+  }
+  .diary-title{
+    margin: 20px 20px 0;
+    padding: 30px 0;
+
+    h2{
+      flex-grow: 1;
+      font-size: $fz-header;
+      font-weight: bold;
+    }
+    .toolbar{
+    }
+  }
+
+  .diary-content{
+    border-top: 2px dashed $color-border;
+    color: $bg-main;
+    font-size: 1rem;
+    margin: 0 20px;
+    padding: 20px 0 60px;
+
+    .content{
+      p{
+        margin-bottom: 0;
+        line-height: 1.5;
+      }
+      .code{
+        font-size: 12px;
+        line-height: 1.3;
+      }
+    }
+  }
+
+}
+
+// iPad
+@media (min-width: $grid-separate-width-md) and (max-width: $grid-separate-width-big) {
+  .diary-detail{
+    padding: 30px;
+    margin: 0 auto;
+  }
+
+  .diary-title{
+  }
+  .diary-content{
+    p{
+      //text-indent: 2rem;
+    }
+    .code{
+      font-size: 14px;
+    }
+  }
+}
+
+
+@media (prefers-color-scheme: dark) {
+// DETAIL
+.diary-detail{
+  background-color: $dark-bg;
+}
+
+  .diary-title{
+    color: $dark-text-title;
+  }
+  .diary-content{
+    border-top-color: $dark-border-active;
+    color: $dark-text;
+  }
+
+  .date-wrapper{
+    color: $dark-text;
+    .date{
+    }
+    .time{
+      color: $dark-text;
+      margin-left: 20px;
+    }
+  }
+  .toolbar{
+  }
+}

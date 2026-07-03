@@ -1,0 +1,114 @@
+@use "sass:math";
+@use "sass:color" as color;
+@use "../../../scss/plugin" as *;
+
+.year-container{
+  overflow-y: auto;
+}
+.year{
+  padding: 20px 0;
+  border-bottom: 1px dashed $color-border-menu;
+}
+.year-header{
+  padding-bottom: 20px;
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+  .count{
+    margin: 0 10px;
+    font-size: 1rem;
+    font-weight: 300;
+  }
+}
+.year-list{
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+}
+.year-month-item{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  @extend .unselectable;
+  border-radius: $radius-mobile;
+  margin-bottom: 10px;
+  width: 22%;
+  margin-right: math.div(100% - 22 * 4, 3);
+  background-color: rgba(white, 0.3);
+  padding: 10px 20px;
+  position: relative;
+  &:nth-child(4n){
+    margin-right: 0;
+  }
+  .month{
+    color: color.adjust($bg-menu, $lightness: -10%);
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  .month-count{
+    color: $bg-menu;
+    top: 5px;
+    right: 5px;
+    position: absolute;
+    font-size: 10px;
+  }
+  &:hover{
+    .month{
+      color: white;
+    }
+    .month-count{
+      color: white;
+    }
+  }
+  &.active{
+    background-color: $color-main;
+    background: linear-gradient(to bottom right, $color-main, color.adjust($color-main, $lightness: -5%));
+    transition: all 0;
+    text-shadow: 1px 0 2px color.adjust(black, $alpha: -0.6);
+    .month{
+      color: white;
+      transition: all 0;
+    }
+    .month-count {
+      color: white;
+      transition: all 0;
+    }
+  }
+}
+
+// >  IPAD
+@media (min-width: $grid-separate-width-big){
+  .year-container{
+    padding: 0;
+  }
+  .year-month-item {}
+}
+
+// Mobile
+@media (max-width: $grid-separate-width-sm){
+  .year-container{
+    padding: 10px;
+  }
+  .year-header{
+    padding-bottom: 10px;
+  }
+  .year-list{}
+}
+
+
+.year-tip{
+  padding: 30px;
+  text-align: center;
+  color: $color-main;
+}
+
+
+// DARK
+@media (prefers-color-scheme: dark) {
+  .year{
+    border-bottom-color: $dark-menu-border;
+  }
+}

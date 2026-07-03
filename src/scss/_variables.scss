@@ -1,0 +1,163 @@
+@use "sass:color" as color;
+
+// Colors
+$green        : #4CD964;
+$cyan         : #5AC8FA;
+$blue         : #007AFF;
+$purple       : #5856D6;
+$magenta      : #FF2D70;
+$red          : #FF3B30;
+$orange       : #FF9500;
+$yellow       : #FFCC00;
+$gray         : #8E8E93;
+$grass        : #8BC34A;
+$sky-blue     : #1BADF8;
+$light-purple : #CC73E1;
+$brown        : #A2845E;
+
+$color-main: #FFCC00;
+
+
+
+// Background Color
+$bg-list-active : #fff3df;
+$bg-lighter     : #f5f5f5;
+$bg-light       : #eee;
+$bg-light-td    : #e1e1e1;
+$bg-light-td-hover : black;
+$bg-main        : #373737;
+$bg-menu        : #4A4A4A;
+$bg-searchbar   : #E5E5EA;
+$bg-share       : #FFFDF8;
+$bg-bill-brief  : #fdfdfd;
+$bg-setup       : #121212;
+$bg-setup-card  : color.adjust(black, $lightness: 18%);
+
+// Border
+$color-border           : #ddd;
+$color-border-bill      : #d7d7d7;
+$color-border-light     : color.adjust($color-border, $lightness: 5%);
+$color-border-highlight : color.adjust($color-border, $lightness: -15%);
+$color-border-share     : #F0E8DB;
+$color-border-menu      : #646464;
+$color-border-search-bar: #646464;
+$color-border-setup     : #4b4a4a;
+
+// Radius
+$radius-mobile: 7px;
+$radius-pc: 10px;
+$radius-whole-ui: 10px;
+
+// Font size
+$fz-list-header         : 24px;
+$fz-list-header-mobile  : 22px;
+$fz-list-content        : 14.5px;
+$fz-list-content-mobile : 15px;
+$fz-note                : 14px;
+$fz-small               : 12px;
+$fz-tiny                : 10px;
+$fz-label               : 16px;
+$fz-main                : 14px;
+$fz-title               : 18px;
+$fz-big                 : 30px;
+$fz-header              : 24px;
+$fz-bankcard-header     : 24px;
+$fz-huge                : 42px;
+$fz-menu                : 19px;
+
+// Color text
+$text-label:          #9B9B9B;
+$text-content:        #373737;
+$text-title:          #232323;
+$text-subtitle:       #666;
+$text-date:           #2d2d2d;
+$text-about-subtitle: #acafb3;
+
+$text-menu-first:    white;
+$text-menu-second:    $text-about-subtitle;
+$text-menu-comment:    $text-subtitle;
+
+
+// Height
+$height-header       : 40px;
+$height-list         : 28px;
+$height-loading      : 30px;
+$height-navbar       : 45px;
+
+// Width
+$width-category-sign : 3px;
+$width-index-date    : 25px;
+
+// Grid
+$grid-separate-width-xs: 375px;
+$grid-separate-width-sm: 768px;
+$grid-separate-width-md: 1024px;
+$grid-separate-width-big : 1366px;
+$grid-separate-width-max : 1520px;
+
+
+$menu-panel-sm: 400px;
+$menu-panel-big: 500px;
+
+// Z-index
+$z-toast        : 500;
+$z-mask         : 300;
+$z-navbar       : 200;
+$z-search       : 150;
+$z-header       : 100;
+$z-waterfall    : 50;
+$z-waterfall-hover: 600;
+
+$weathers: (
+        "sunny",
+        "cloudy",
+        "overcast",
+        "fog",
+        "sprinkle",
+        "rain",
+        "thunderstorm",
+        "snow"
+);
+
+
+// DARK VALUES
+$dark-color: black;
+$dark-bg               : color.adjust($dark-color, $lightness: 20%) ;
+$dark-bg-dark          : color.adjust($dark-color, $lightness: 15%) ;
+$dark-bg-selector      : color.adjust($dark-color, $lightness: 20%) ;
+$dark-bg-page-header   : color.adjust($dark-color, $lightness: 35%) ;
+
+$dark-bg-nav           : color.adjust($dark-color, $lightness: 10%) ;
+$dark-border-nav       : color.adjust($dark-color, $lightness: 2%) ;
+$dark-border-setup     : #3b3b3b;
+
+$dark-bg-td            : color.adjust($dark-color, $lightness: 23%);
+$dark-bg-td-even       : color.adjust($dark-color, $lightness: 20%);
+$dark-bg-td-active     : color.adjust($dark-color, $lightness: 30%);
+$dark-bg-bill-brief    : color.adjust($dark-color, $lightness: 18%);
+$dark-bg-main          : color.adjust($dark-color, $lightness: 20%);
+$dark-bg-menu          : color.adjust($dark-color, $lightness: 18%);
+$dark-bg-setup-card    : color.adjust($bg-setup-card, $lightness: -4%);
+
+
+
+$dark-border           : color.adjust($dark-color, $lightness: 26%) ;
+$dark-border-active    : color.adjust($dark-color, $lightness: 35%) ;
+
+$dark-menu-border      : color.adjust($dark-color, $lightness: 28%)  ;
+$dark-list-header-bg   : color.adjust($dark-color, $lightness: 14%) ;
+$dark-list-bg          : color.adjust($dark-color, $lightness: 20%) ;
+$dark-list-bg-active   : color.adjust($dark-color, $lightness: 23%) ;
+$dark-text-title       : color.adjust($dark-color, $lightness: 85%) ;
+$dark-text-label       : color.adjust($dark-color, $lightness: 35%) ;
+$dark-text             : color.adjust($dark-color, $lightness: 70%) ;
+$dark-text-subtitle    : color.adjust($dark-color, $lightness: 60%) ;
+
+$dark-text-header-date: color.adjust($dark-color, $lightness: 80%) ;
+$dark-text-header-lunar: color.adjust($dark-color, $lightness: 60%) ;
+
+$dark-text-bill-price  : color.adjust($dark-color, $lightness: 80%) ;
+
+$dark-scroll-thumb     : color.adjust($dark-color, $lightness: 30%) ;
+
+
