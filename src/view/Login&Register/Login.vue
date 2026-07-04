@@ -1,5 +1,5 @@
 <template>
-    <div class="body-login-bg ios-login-bg" :style="`min-height: ${projectStore.insets.windowsHeight}px`">
+    <div class="login-page" :style="`min-height: ${projectStore.insets.windowsHeight}px`">
         <transition
             enter-active-class="animated-fast fadeIn"
             leave-active-class="animated-fast faceOut"
@@ -150,10 +150,15 @@ function useTestAccount() {
 
 </script>
 <style lang="scss" scoped>
-@use "../../scss/plugin" as *;
-.ios-login-bg{
-    align-items: center;
+.login-page{
+    min-height: 100dvh;
     padding: 24px;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(0, 122, 255, 0.13), transparent 34%),
+        var(--diary-bg);
+    color: var(--diary-ink);
+    display: grid;
+    place-items: center;
 }
 .ios-login-shell{
     position: relative;
@@ -178,7 +183,7 @@ function useTestAccount() {
     p{
         margin-bottom: 6px;
         color: var(--diary-accent);
-        font-size: $fz-small;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -194,7 +199,7 @@ function useTestAccount() {
         display: block;
         margin-top: 10px;
         color: var(--diary-muted);
-        font-size: $fz-main;
+        font-size: 14px;
     }
 }
 .ios-login-form{
@@ -214,19 +219,19 @@ function useTestAccount() {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: $fz-tiny;
+    font-size: 12px;
     line-height: 1;
-    color: $text-subtitle;
+    color: var(--diary-muted);
     a{
-        color: $dark-text-subtitle;
+        color: var(--diary-muted);
 
         &:hover{
-            color: $color-main;
+            color: var(--diary-accent);
             text-decoration: underline;
         }
     }
     .version{
-        color: $dark-text-subtitle;
+        color: var(--diary-muted);
     }
     .project-name{
         font-weight: bold;
@@ -235,21 +240,14 @@ function useTestAccount() {
     }
     .version{
     }
-    .password{
-        color: $dark-text-subtitle;
-        @extend .btn-like;
-        &:hover{
-            color: $color-main;
-        }
-    }
 }
 @media (prefers-color-scheme: dark) {
     .ios-login-card{
         background: rgba(28, 28, 30, 0.82);
     }
 }
-@media (max-width: $grid-separate-width-sm) {
-    .ios-login-bg{
+@media (max-width: 640px) {
+    .login-page{
         padding: 16px;
     }
     .ios-login-card{

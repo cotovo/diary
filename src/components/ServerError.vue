@@ -16,9 +16,10 @@ const projectStore = useProjectStore()
 </script>
 
 <style scoped lang="scss">
-@use "../scss/plugin" as *;
-
 .server-error{
+    min-height: 100dvh;
+    padding: 24px;
+    background: var(--diary-bg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,8 +36,10 @@ const projectStore = useProjectStore()
 
 .server-error-title{
     text-align: center;
+    max-width: 360px;
+    color: var(--diary-muted);
     font-size: 14px;
-    color: #FFCC00;
+    line-height: 1.65;
 }
 
 
