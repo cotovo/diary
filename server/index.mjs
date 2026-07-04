@@ -1556,6 +1556,15 @@ async function main() {
     }
   });
 
+  server.on("error", (err) => {
+    if (err?.code === "EADDRINUSE") {
+      console.error(`Port ${port} is already in use. Stop the existing process or run with PORT=${port + 1}.`);
+      process.exit(1);
+    }
+    console.error(err);
+    process.exit(1);
+  });
+
   server.listen(port, () => {
     console.log(`Diary API server: http://127.0.0.1:${port}`);
     console.log(`Data directory: ${dataDir}`);

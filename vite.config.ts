@@ -8,6 +8,7 @@ import {dateFormatter} from "./src/utility";
 import fs from 'fs'
 
 const timeStringNow = dateFormatter(new Date(), 'yyyy-MM-dd-hh-mm-ss')
+const apiPort = Number(process.env.API_PORT || process.env.PORT || 3000)
 
 // Plugin to handle markdown files as raw text
 const markdownPlugin = () => {
@@ -32,7 +33,7 @@ export default defineConfig({
         https: false,
         proxy: {
             '/dev': {
-                target: 'http://localhost:3000',
+                target: `http://localhost:${apiPort}`,
                 // target: 'http://kylebing.cn:3000',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/dev/, '/'),
