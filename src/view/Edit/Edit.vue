@@ -39,56 +39,65 @@
         </main>
 
         <aside class="diary-edit-meta" aria-label="日记上下文">
-            <section class="context-section date-context-section">
-                <div class="context-section-header">
-                    <h3>时间</h3>
-                </div>
-                <EditorVCalendarSelector
-                    @dayChange="dayHasChanged"
-                    v-model="diary.date"/>
-            </section>
+            <div class="meta-panel">
+                <header class="meta-panel-header">
+                    <div>
+                        <span>写作检查器</span>
+                        <p>日期、分类、心情与天气</p>
+                    </div>
+                </header>
 
-            <section class="context-section writing-attributes-section">
-                <div class="context-section-header">
-                    <h3>写作属性</h3>
-                </div>
-                <EditCategorySelector :category="diary.category" @change="setCategory"/>
-                <MoodTagPicker
-                    v-model:mood="diary.mood"
-                    v-model:tags="diary.tags"
+                <section class="context-block date-context-section">
+                    <div class="context-section-header">
+                        <h3>时间</h3>
+                    </div>
+                    <EditorVCalendarSelector
+                        @dayChange="dayHasChanged"
+                        v-model="diary.date"/>
+                </section>
+
+                <section class="context-block writing-attributes-section">
+                    <div class="context-section-header">
+                        <h3>写作属性</h3>
+                    </div>
+                    <EditCategorySelector :category="diary.category" @change="setCategory"/>
+                    <MoodTagPicker
+                        v-model:mood="diary.mood"
+                        v-model:tags="diary.tags"
+                    />
+                </section>
+
+                <WeatherLocationCard
+                    :loading="isResolvingContext"
+                    :weather="diary.weather"
+                    :weather-text="diary.weatherText || ''"
+                    :temperature-inside="String(diary.temperature || '')"
+                    :temperature-outside="String(diary.temperature_outside || '')"
+                    :location-name="diary.locationName || ''"
+                    :humidity="diary.humidity || ''"
+                    :wind-text="diary.windText || ''"
+                    :context-updated-at="diary.contextUpdatedAt || ''"
+                    @update:temperature-inside="value => diary.temperature = value"
+                    @update:temperature-outside="value => diary.temperature_outside = value"
+                    @resolve-location="resolveContextFromBrowser"
+                    @resolve-city="resolveContextFromCity"
+                    @clear="clearDiaryContext"
                 />
-            </section>
 
-            <WeatherLocationCard
-                :loading="isResolvingContext"
-                :weather="diary.weather"
-                :weather-text="diary.weatherText || ''"
-                :temperature-inside="String(diary.temperature || '')"
-                :temperature-outside="String(diary.temperature_outside || '')"
-                :location-name="diary.locationName || ''"
-                :humidity="diary.humidity || ''"
-                :wind-text="diary.windText || ''"
-                :context-updated-at="diary.contextUpdatedAt || ''"
-                @update:temperature-inside="value => diary.temperature = value"
-                @update:temperature-outside="value => diary.temperature_outside = value"
-                @resolve-location="resolveContextFromBrowser"
-                @resolve-city="resolveContextFromCity"
-                @clear="clearDiaryContext"
-            />
-
-            <section class="context-section">
-                <div class="context-section-header">
-                    <h3>写作设置</h3>
-                </div>
-                <NForm label-placement="left" label-width="92" :show-feedback="false">
-                    <NFormItem label="公开分享">
-                        <NSwitch v-model:value="diary.is_public"/>
-                    </NFormItem>
-                    <NFormItem label="Markdown">
-                        <NSwitch v-model:value="diary.is_markdown"/>
-                    </NFormItem>
-                </NForm>
-            </section>
+                <section class="context-block settings-context-section">
+                    <div class="context-section-header">
+                        <h3>写作设置</h3>
+                    </div>
+                    <NForm label-placement="left" label-width="92" :show-feedback="false">
+                        <NFormItem label="公开分享">
+                            <NSwitch v-model:value="diary.is_public"/>
+                        </NFormItem>
+                        <NFormItem label="Markdown">
+                            <NSwitch v-model:value="diary.is_markdown"/>
+                        </NFormItem>
+                    </NForm>
+                </section>
+            </div>
         </aside>
     </div>
 </template>

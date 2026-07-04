@@ -1,5 +1,5 @@
 <template>
-    <section class="context-section">
+    <section class="context-block weather-context-section">
         <div class="context-section-header">
             <h3>天气与位置</h3>
         </div>

@@ -1,25 +1,141 @@
-@use "sass:color" as color;
-@use "../../scss/plugin" as *;
+.profile-page {
+  min-height: 100dvh;
+  padding: 24px;
+  background: var(--diary-bg);
+  color: var(--diary-ink);
+  display: grid;
+  place-items: center;
+}
 
-.avatar{
-  flex-shrink: 0;
-  box-sizing: content-box;
-  @extend .btn-like;
-  transition: all 0.3s;
+.profile-panel {
+  width: min(100%, 520px);
+  border: 1px solid var(--diary-border);
+  border-radius: var(--diary-radius);
+  background: var(--diary-surface);
+  box-shadow: var(--diary-card-shadow);
+  overflow: hidden;
+}
+
+.profile-header {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2.5px solid $color-main;
-  img{
-      width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--diary-border);
+
+  h1 {
+    margin: 0;
+    color: var(--diary-ink);
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 780;
+    letter-spacing: 0;
   }
-  &:hover{
-    border-color: $color-main;
-    transition: all 0.3s;
-    box-shadow: 0 0 25px color.adjust($color-main, $alpha: -0.3);
+
+  p {
+    margin: 5px 0 0;
+    color: var(--diary-muted);
+    font-size: 13px;
+    line-height: 1.55;
   }
 }
 
-input[type=file]{
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid var(--diary-border);
+  background: var(--diary-surface-muted);
+}
+
+.avatar-uploader {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  flex: 0 0 auto;
+  border: 1px solid var(--diary-border);
+  border-radius: var(--diary-radius);
+  background: var(--diary-surface);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--diary-hairline-shadow);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  span {
+    position: absolute;
+    inset: auto 6px 6px;
+    min-height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.62);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 650;
+    backdrop-filter: blur(10px);
+  }
+}
+
+.avatar-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+
+  strong,
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--diary-ink);
+    font-size: 17px;
+    font-weight: 760;
+  }
+
+  span {
+    color: var(--diary-muted);
+    font-size: 13px;
+  }
+}
+
+.profile-form {
+  padding: 20px 20px 4px;
+}
+
+.profile-actions {
+  padding: 16px 20px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+input[type=file] {
   display: none;
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    padding: 12px;
+    place-items: stretch;
+  }
+
+  .profile-panel {
+    width: 100%;
+  }
+
+  .profile-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
 }

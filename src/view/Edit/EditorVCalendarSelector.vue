@@ -1,9 +1,9 @@
 <template>
     <div class="date-selector">
         <div class="date-set-item">
-            <div class="button-date-change" @click="dateMove(-1)">
-                <div>&lt;</div>
-            </div>
+            <button class="button-date-change" type="button" aria-label="前一天" @click="dateMove(-1)">
+                <ChevronLeft :size="18"/>
+            </button>
             <DatePicker
                 locale="zh"
                 v-model="modelDate"
@@ -30,9 +30,9 @@
                 </template>
             </DatePicker>
 
-            <div class="button-date-change" @click="dateMove(1)">
-                <div>&gt;</div>
-            </div>
+            <button class="button-date-change" type="button" aria-label="后一天" @click="dateMove(1)">
+                <ChevronRight :size="18"/>
+            </button>
         </div>
         <div class="date-meta">
             <div class="lunar">{{lunarObject.IMonthCn}}{{lunarObject.IDayCn}}</div>
@@ -54,6 +54,7 @@ import {dateFormatter} from "@/utility.ts";
 import type {PopoverOptions} from "v-calendar";
 import TimePicker from "@/view/Edit/TimePicker.vue";
 import {NButton} from "naive-ui";
+import {ChevronLeft, ChevronRight} from "@lucide/vue";
 
 const emit = defineEmits(["dayChange"])
 const modelDate = defineModel<Date>({ // v-model value

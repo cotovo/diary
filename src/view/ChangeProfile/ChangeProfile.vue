@@ -1,58 +1,77 @@
 <template>
-    <div class="body-login-bg" :style="`min-height: ${projectStore.insets.windowsHeight}px`">
+    <div class="profile-page" :style="`min-height: ${projectStore.insets.windowsHeight}px`">
         <transition
             enter-active-class="animated-fast fadeIn"
             leave-active-class="animated-fast faceOut"
         >
-            <div class="body-login" v-if="show">
-                <div class="logo-wrapper mb-6">
-                    <label class="logo avatar" for="avatar">
-                        <img v-if="formUser.avatar"
-                             :src="formUser.avatar + '-' + projectConfig.qiniu_style_suffix || SVG_ICONS.logo_icons.logo_avatar"
-                             alt="Diary Logo"
+            <div class="profile-panel" v-if="show">
+                <header class="profile-header">
+                    <NButton quaternary circle aria-label="返回" @click="router.go(-1)">
+                        <template #icon><ArrowLeft :size="18"/></template>
+                    </NButton>
+                    <div>
+                        <h1>个人资料</h1>
+                        <p>用于日记署名、天气城市和个人头像</p>
+                    </div>
+                </header>
+
+                <div class="avatar-row">
+                    <label class="avatar-uploader" for="avatar">
+                        <img
+                            v-if="formUser.avatar"
+                            :src="formUser.avatar + '-' + projectConfig.qiniu_style_suffix || SVG_ICONS.logo_icons.logo_avatar"
+                            alt="头像"
                         >
-                        <img v-else :src="SVG_ICONS.logo_icons.logo_avatar" alt="Avatar">
+                        <img v-else :src="SVG_ICONS.logo_icons.logo_avatar" alt="默认头像">
+                        <span><Camera :size="16"/>更换头像</span>
                     </label>
-                    <input type="file" @change="uploadAvatar" id="avatar">
+                    <input type="file" accept="image/*" @change="uploadAvatar" id="avatar">
+                    <div class="avatar-copy">
+                        <strong>{{ formUser.nickname || '未设置昵称' }}</strong>
+                        <span>{{ formUser.city || '未设置城市' }}</span>
+                    </div>
                 </div>
-                <form id="changeProfileForm">
-                    <div class="input-group">
-                        <label for="nickname">昵称</label>
-                        <input v-model="formUser.nickname"
-                               type="text"
-                               name="nickname"
-                               id="nickname">
-                    </div>
-                    <div class="input-group">
-                        <label for="phone">手机号</label>
-                        <input v-model.lazy="formUser.phone"
-                               type="text"
-                               name="phone"
-                               id="phone">
-                    </div>
-                    <div class="input-group">
-                        <label for="city">城市</label>
-                        <input v-model="formUser.city"
-                               type="text"
-                               name="city"
-                               id="city">
-                    </div>
-                    <div class="input-group">
-                        <label for="geolocation">经纬度</label>
-                        <input v-model="formUser.geolocation"
-                               type="text"
-                               disabled
-                               name="geolocation"
-                               id="geolocation">
-                    </div>
-                    <button class="btn mt-8 btn-active"
-                            type="button"
-                            @click.prevent="changeProfileSubmit">确定修改
-                    </button>
-                </form>
-                <div class="footer flex-start">
-                    <div class="link" @click="router.go(-1)">返回</div>
-                </div>
+
+                <NForm class="profile-form" label-placement="top" :show-feedback="false">
+                    <NFormItem label="昵称">
+                        <NInput
+                            v-model:value="formUser.nickname"
+                            input-id="nickname"
+                            placeholder="写日记时显示的名字"
+                        />
+                    </NFormItem>
+                    <NFormItem label="手机号">
+                        <NInput
+                            v-model:value="formUser.phone"
+                            input-id="phone"
+                            placeholder="可选"
+                            type="tel"
+                        />
+                    </NFormItem>
+                    <NFormItem label="城市">
+                        <NInput
+                            v-model:value="formUser.city"
+                            input-id="city"
+                            placeholder="例如：上海"
+                        />
+                    </NFormItem>
+                    <NFormItem label="经纬度">
+                        <NInput
+                            v-model:value="formUser.geolocation"
+                            input-id="geolocation"
+                            placeholder="城市识别后自动填入"
+                            disabled
+                        />
+                    </NFormItem>
+                </NForm>
+
+                <footer class="profile-actions">
+                    <NButton secondary @click="router.go(-1)">取消</NButton>
+                    <NButton type="primary" @click.prevent="changeProfileSubmit">
+                        <template #icon><Save :size="16"/></template>
+                        保存资料
+                    </NButton>
+                </footer>
             </div>
         </transition>
     </div>
@@ -75,13 +94,15 @@ import {computed, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import SVG_ICONS from "@/assets/icons/SVG_ICONS.ts";
 import {UserProfileEntity} from "@/entity/User.ts";
+import {NButton, NForm, NFormItem, NInput} from "naive-ui";
+import {ArrowLeft, Camera, Save} from "@lucide/vue";
 
 const router = useRouter()
 const projectConfig = computed(() => systemConfigStore.config)
 
 
 const show = ref(false)
-let avatarFile = null // 头像文件
+let avatarFile: File | null = null // 头像文件
 const formUser = ref<UserProfileEntity>({
     nickname: '',
     phone: '',
@@ -93,11 +114,11 @@ const formUser = ref<UserProfileEntity>({
 onMounted(()=>{
     show.value = true
     document.title = '日记 - 资料修改' // 变更标题
-    formUser.value.nickname = getAuthorization()?.nickname
-    formUser.value.phone = getAuthorization()?.phone
-    formUser.value.avatar = getAuthorization()?.avatar
-    formUser.value.city = getAuthorization()?.city
-    formUser.value.geolocation = getAuthorization()?.geolocation
+    formUser.value.nickname = getAuthorization()?.nickname || ''
+    formUser.value.phone = getAuthorization()?.phone || ''
+    formUser.value.avatar = getAuthorization()?.avatar || ''
+    formUser.value.city = getAuthorization()?.city || ''
+    formUser.value.geolocation = getAuthorization()?.geolocation || ''
 
     // 在给 formUser.city 赋值之后再添加其 watcher
     watch(() => formUser.value.city, newValue => {
