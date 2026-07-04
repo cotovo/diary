@@ -7,8 +7,9 @@
 
         <div class="weather-summary">
             <div class="weather-summary-main">
+                <span class="weather-kicker">{{ weatherLabel }}</span>
                 <strong>{{ locationName || '等待识别位置' }}</strong>
-                <span>{{ weatherLabel }}</span>
+                <span class="weather-note">{{ contextUpdatedAt ? `更新于 ${updatedLabel}` : '新日记会自动尝试识别' }}</span>
             </div>
             <div class="weather-temp">
                 {{ normalizedOutsideTemperature }}<small>℃</small>
@@ -49,16 +50,16 @@
                     />
                 </NFormItemGi>
                 <NFormItemGi label="城市" :span="2">
-                    <NInputGroup class="city-resolve-group">
+                    <div class="city-resolve-row">
                         <NInput size="small" v-model:value="cityKeyword" placeholder="例如：上海"/>
-                        <NButton size="small" :loading="loading" @click="emit('resolve-city', cityKeyword)">识别</NButton>
-                    </NInputGroup>
+                        <NButton size="small" secondary :loading="loading" @click="emit('resolve-city', cityKeyword)">识别</NButton>
+                    </div>
                 </NFormItemGi>
             </NGrid>
         </NForm>
 
         <div class="context-actions">
-            <NButton secondary size="small" :loading="loading" @click="emit('resolve-location')">
+            <NButton secondary size="small" block :loading="loading" @click="emit('resolve-location')">
                 <template #icon><LocateFixed :size="16"/></template>
                 使用当前位置
             </NButton>
@@ -71,7 +72,7 @@
 
 <script lang="ts" setup>
 import {computed, ref} from "vue"
-import {NButton, NForm, NFormItemGi, NGrid, NInput, NInputGroup} from "naive-ui"
+import {NButton, NForm, NFormItemGi, NGrid, NInput} from "naive-ui"
 import {LocateFixed} from "@lucide/vue"
 
 const props = defineProps<{

@@ -91,14 +91,22 @@
                     <div class="context-section-header">
                         <h3>写作设置</h3>
                     </div>
-                    <NForm class="settings-form" label-placement="left" label-width="82" :show-feedback="false">
-                        <NFormItem label="公开分享">
+                    <div class="settings-list">
+                        <label class="settings-row">
+                            <span>
+                                <strong>公开分享</strong>
+                                <small>生成可公开访问的阅读页</small>
+                            </span>
                             <NSwitch v-model:value="diary.is_public"/>
-                        </NFormItem>
-                        <NFormItem label="Markdown">
+                        </label>
+                        <label class="settings-row">
+                            <span>
+                                <strong>Markdown</strong>
+                                <small>按 Markdown 语法保存正文</small>
+                            </span>
                             <NSwitch v-model:value="diary.is_markdown"/>
-                        </NFormItem>
-                    </NForm>
+                        </label>
+                    </div>
                 </section>
             </div>
         </aside>
@@ -107,7 +115,7 @@
 
 <script lang="ts" setup>
 import Moment from 'moment'
-import {NForm, NFormItem, NSwitch} from "naive-ui"
+import {NSwitch} from "naive-ui"
 
 // components
 import EditCategorySelector from "./CategorySelector/EditorCategorySelector.vue"
