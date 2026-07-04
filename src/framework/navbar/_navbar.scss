@@ -47,13 +47,18 @@
   gap: 4px;
 
   &.editor-action-group {
-    height: 36px;
-    padding: 3px;
-    gap: 3px;
+    min-height: 34px;
+    padding: 2px;
+    gap: 2px;
     border: 1px solid var(--diary-border);
     border-radius: 8px;
-    background: var(--diary-surface);
+    background: color-mix(in srgb, var(--diary-surface) 92%, transparent);
     box-shadow: var(--diary-hairline-shadow);
+    transition: border-color var(--diary-transition), background-color var(--diary-transition);
+
+    &.dirty {
+      border-color: color-mix(in srgb, var(--diary-accent) 28%, var(--diary-border));
+    }
   }
 }
 
@@ -79,38 +84,54 @@
     color: var(--diary-danger);
   }
 
-  &.save {
-    color: #fff;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    border-radius: 8px;
-    box-shadow: 0 6px 14px rgba(0, 122, 255, 0.22);
+}
 
-    &.saved {
-      background: var(--diary-success);
-      border-color: var(--diary-success);
-      box-shadow: 0 6px 14px rgba(52, 199, 89, 0.18);
+.editor-recover-button {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 8px;
+
+  &:hover {
+    background: var(--diary-surface-muted);
+  }
+}
+
+.nav-save-button {
+  min-width: 74px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 720;
+  box-shadow: 0 5px 12px rgba(0, 122, 255, 0.18);
+
+  &.saved {
+    color: var(--diary-success);
+    background: color-mix(in srgb, var(--diary-success) 12%, transparent);
+    border-color: color-mix(in srgb, var(--diary-success) 28%, var(--diary-border));
+    box-shadow: none;
+
+    :deep(.n-button__border),
+    :deep(.n-button__state-border) {
+      border-color: color-mix(in srgb, var(--diary-success) 28%, var(--diary-border));
+    }
+
+    :deep(.n-button__content),
+    :deep(.n-button__icon) {
+      color: var(--diary-success);
     }
   }
 }
 
-.nav-add-button.editor-add {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
+.nav-save-button :deep(.n-button__border),
+.nav-save-button :deep(.n-button__state-border),
+.nav-save-button :deep(.n-button__ripple) {
   border-radius: 8px;
-  color: var(--diary-muted);
-
-  &:hover {
-    background: var(--diary-surface-muted);
-    color: var(--diary-accent);
-  }
 }
 
-.nav-save-button :deep(.n-button__border),
-.nav-save-button :deep(.n-button__state-border) {
-  border-radius: 8px;
+.save-action-label {
+  line-height: 1;
 }
 
 .nav-logo-button {
@@ -253,14 +274,13 @@
   }
 
   .nav-action-group.editor-action-group {
-    height: 38px;
+    min-height: 38px;
+    padding: 3px;
   }
 
-  .nav-icon-button.nav-save-button,
-  .nav-add-button.editor-add {
-    width: 32px;
+  .nav-save-button {
     height: 32px;
-    min-width: 32px;
+    min-width: 76px;
   }
 
   #toast .toast {

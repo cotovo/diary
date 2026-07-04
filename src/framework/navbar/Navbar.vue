@@ -184,12 +184,15 @@
                     </NButton>
                 </div>
 
-                <div class="nav-action-group editor-action-group" v-if="isEditingRoute">
+                <div
+                    v-if="isEditingRoute"
+                    :class="['nav-action-group', 'editor-action-group', { dirty: hasUnsavedChanges }]"
+                >
                     <NButton
                         v-if="projectStore.isDiaryEditorContentHasChanged"
                         quaternary
                         circle
-                        class="nav-icon-button"
+                        class="nav-icon-button editor-recover-button"
                         title="恢复到上次保存"
                         aria-label="恢复到上次保存"
                         @click="diaryRecover"
@@ -197,19 +200,20 @@
                         <template #icon><Undo2 :size="19"/></template>
                     </NButton>
                     <NButton
-                        circle
                         type="primary"
-                        class="nav-icon-button save nav-save-button"
+                        size="small"
+                        class="nav-save-button"
                         :loading="projectStore.isSavingDiary"
-                        :class="{ saved: !isNewDiary && !projectStore.isDiaryEditorContentHasChanged }"
-                        :title="projectStore.isDiaryEditorContentHasChanged || isNewDiary ? '保存日记' : '已保存'"
-                        :aria-label="projectStore.isDiaryEditorContentHasChanged || isNewDiary ? '保存日记' : '已保存'"
+                        :class="{ saved: !hasUnsavedChanges }"
+                        :title="saveButtonTitle"
+                        :aria-label="saveButtonTitle"
                         @click="diarySave"
                     >
                         <template #icon>
-                            <Check v-if="isNewDiary || projectStore.isDiaryEditorContentHasChanged" :size="20"/>
-                            <CheckCircle2 v-else :size="20"/>
+                            <Check v-if="hasUnsavedChanges" :size="17"/>
+                            <CheckCircle2 v-else :size="17"/>
                         </template>
+                        <span class="save-action-label">{{ saveButtonLabel }}</span>
                     </NButton>
                 </div>
 
@@ -307,6 +311,9 @@ const isListLikeRoute = computed(() => route.name === 'List' || route.name === '
 const isNewDiary = computed(() => !route.params.id)
 const isTodoOnly = computed(() => projectStore.filteredCategories.length === 1 && projectStore.filteredCategories[0] === 'todo')
 const editingDiaryTitle = computed(() => projectStore.editingDiaryTitle.replace(/\s+/g, ' ').trim())
+const hasUnsavedChanges = computed(() => isNewDiary.value || projectStore.isDiaryEditorContentHasChanged)
+const saveButtonLabel = computed(() => hasUnsavedChanges.value ? '保存' : '已保存')
+const saveButtonTitle = computed(() => hasUnsavedChanges.value ? '保存日记' : '日记已保存')
 const dateFilterRangeLabel = computed(() =>
     formatDiaryDateRangeLabel(projectStore.dateFilterTimeStart, projectStore.dateFilterTimeEnd)
 )
@@ -320,8 +327,11 @@ const showSearchButton = computed(() =>
 )
 const showDesktopNavTools = computed(() => !projectStore.isMenuShowed && !projectStore.isInMobileMode)
 const showAddButton = computed(() =>
-    (projectStore.isInMobileMode && route.name !== 'Detail' && !projectStore.isMenuShowed)
-    || !projectStore.isInMobileMode
+    !isEditingRoute.value
+    && (
+        (projectStore.isInMobileMode && route.name !== 'Detail' && !projectStore.isMenuShowed)
+        || !projectStore.isInMobileMode
+    )
 )
 const showMobileBrand = computed(() =>
     projectStore.isInMobileMode
