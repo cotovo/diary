@@ -8,15 +8,16 @@ body{
 
 .diary {
   padding-top: $height-navbar;
+  background: var(--diary-bg);
   .diary-list-container {
-    border-radius: $radius-whole-ui;
+    border-radius: 0;
     overflow: hidden;
     overflow-y: auto;
     width: 100%;
-    background-color: $bg-light;
+    background: var(--diary-bg);
   }
   .diary-container {
-    border-radius: $radius-whole-ui;
+    border-radius: 0;
     overflow: hidden;
   }
 }
@@ -30,11 +31,11 @@ body{
   .diary {
     display: flex;
     .diary-list-container {
-      border-right: 1px solid $color-border;
+      border-right: 1px solid var(--diary-border);
       overflow-y: auto;
-      width: $menu-panel-big;
+      width: clamp(360px, 25vw, 440px);
       flex-shrink: 0;
-      background-color: $bg-light;
+      background: var(--diary-bg);
     }
     .diary-container {
       display: block;
@@ -50,8 +51,8 @@ body{
     padding-top: $height-navbar;
     display: flex;
     .diary-list-container {
-      border-right: 1px solid $color-border;
-      width: 400px;
+      border-right: 1px solid var(--diary-border);
+      width: 380px;
     }
     .diary-container {
       display: block;

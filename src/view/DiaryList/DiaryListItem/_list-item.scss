@@ -2,56 +2,67 @@
 
 .diary-list-item{
   cursor: pointer;
-  background-color: white;
-  display: block;
-  flex-flow: row nowrap;
-  height: $height-list;
+  position: relative;
+  min-height: 34px;
+  margin: 0 8px 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--diary-surface);
+  display: grid;
+  grid-template-columns: 4px 34px minmax(0, 1fr);
+  align-items: center;
+  overflow: hidden;
+  transition:
+    background-color var(--diary-transition),
+    border-color var(--diary-transition),
+    box-shadow var(--diary-transition);
   &:last-child{
     .detail{
       border: 0;
     }
   }
   &:hover{
-    background-color: $bg-list-active;
+    background: var(--diary-bg-elevated);
+    border-color: var(--diary-border);
   }
   .category{
-    float: left;
-    width: $width-category-sign;
-    height: $height-list;
+    width: 4px;
+    height: 100%;
     display: block;
   }
   .date{
-    float: left;
-    width: $width-index-date;
-    padding: 0 5px;
-    flex-shrink: 0;
+    width: 34px;
+    padding: 0 4px;
     text-align: center;
-    line-height: $height-list;
-    font-size: $fz-list-content;
-    font-weight: bold;
-    color: $text-date;
+    line-height: 32px;
+    font-size: 13px;
+    font-weight: 760;
+    color: var(--diary-muted);
+    font-variant-numeric: tabular-nums;
   }
   .detail{
     position: relative;
     display: flex;
     padding-right: 8px;
-    margin-left: 35px;
+    min-width: 0;
+    margin-left: 0;
     .title{
       flex-grow: 1;
       flex-shrink: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      line-height: $height-list;
+      line-height: 32px;
       display: block;
-      font-size: $fz-list-content;
-      color: $text-title;
+      font-size: 13px;
+      color: var(--diary-ink);
     }
     .icon{
       flex-shrink: 0;
-      padding: 4px 0;
-      height: $height-list;
-      width: $height-list - 4 * 2;
+      padding: 7px 0;
+      height: 32px;
+      width: 18px;
+      opacity: 0.62;
       display: block;
     }
     &:after{
@@ -67,9 +78,15 @@
     }
   }
   &.active{
+    border-color: var(--entry-category-border, var(--diary-border-strong));
+    background:
+      linear-gradient(90deg, var(--entry-category-soft, rgba(0, 122, 255, 0.1)), transparent 58%),
+      var(--diary-surface);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--entry-category-color, var(--diary-accent)) 12%, transparent);
+
     .title, .date{
-      color: white;
-      text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+      color: var(--diary-ink);
+      text-shadow: none;
     }
     .detail{
       &:after{
@@ -82,6 +99,7 @@
 
 @media (max-width: $grid-separate-width-sm) {
   .diary-list-item{
+    margin-inline: 6px;
     .date{
       font-size: $fz-list-content-mobile;
     }
@@ -100,26 +118,26 @@
 @media (prefers-color-scheme: dark) {
   // LIST ITEM
   .diary-list-item{
-    background-color: $dark-list-bg;
+    background-color: var(--diary-surface);
     &:hover{
-      background-color: $dark-list-bg-active;
+      background-color: var(--diary-surface-strong);
     }
     .date{
-      color: $dark-text;
+      color: var(--diary-muted);
     }
     .detail{
       .title{
-        color: $dark-text-title;
+        color: var(--diary-ink);
       }
       &:after{
-        border-bottom-color: $dark-border;
+        border-bottom-color: var(--diary-border);
       }
     }
 
     &.active{
       .title, .date{
-        color: white;
-        text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        color: var(--diary-ink);
+        text-shadow: none;
       }
       .detail{
         &:after{

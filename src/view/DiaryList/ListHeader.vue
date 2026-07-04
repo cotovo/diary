@@ -30,27 +30,29 @@ const isWithSearch = computed(() => {
     position: sticky;
     top: 0;
     z-index: $z-header;
-    font-size: $fz-list-header;
+    font-size: 22px;
     text-align: left;
-    padding: 3px 20px;
-    background-color: $bg-light;
-    line-height: $height-header;
+    padding: 12px 18px 8px;
+    background: rgba(245, 245, 247, 0.94);
+    line-height: 1.2;
     font-family: "Galvji", sans-serif;
-    color: black;
-    font-weight: bold;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    color: var(--diary-ink);
+    font-weight: 760;
+    letter-spacing: 0;
+    text-shadow: none;
     transition: top 0.3s ease-in-out;
-    border-bottom: 1px solid $color-border;
+    border-bottom: 1px solid transparent;
+    backdrop-filter: blur(16px);
     &.big{
-        padding: 10px 20px;
+        padding: 14px 18px 10px;
         height: auto;
-        font-size: $fz-big;
+        font-size: 24px;
     }
     &.medium{
         border-bottom: none;
-        padding: 3px 20px;
+        padding: 12px 18px 8px;
         height: auto;
-        font-size: $fz-list-header + 3;
+        font-size: 24px;
     }
     &.with-search{
         transition: top 0.3s ease-in-out;
@@ -67,10 +69,10 @@ const isWithSearch = computed(() => {
 
 @media (prefers-color-scheme: dark) {
     .list-header{
-        border-color: $dark-border !important;
-        background-color: $dark-list-header-bg !important;
-        color: white !important;
-        border-bottom: 1px solid $dark-border !important;
+        border-color: transparent !important;
+        background: rgba(0, 0, 0, 0.84) !important;
+        color: var(--diary-ink) !important;
+        border-bottom: 1px solid transparent !important;
     }
 }
 

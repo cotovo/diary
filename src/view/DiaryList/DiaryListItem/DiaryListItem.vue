@@ -60,9 +60,8 @@ const weatherIcon = computed(() => {
     }
 })
 const diaryItemStyle = computed(() => {
-    if (props.isActive){
-        return `background-color: ${statisticStore.getCategoryColor(props.diary.category)}`
-    }
+    const color = statisticStore.getCategoryColor(props.diary.category)
+    return `--entry-category-color: ${color}; --entry-category-soft: ${color}1a; --entry-category-border: ${color}55;`
 })
 const contentIcon = computed(() => {
     if (props.diary.is_markdown === 1){
