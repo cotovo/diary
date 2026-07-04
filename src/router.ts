@@ -55,8 +55,8 @@ const routes: RouteRecordRaw[] = [
     {name: 'Statistics',           path: '/statistics',        component: () => import('@/view/Statistics/StatisticsIndex.vue') },
     {name: 'FileManager',          path: '/file-manager',      component: () => import('@/view/FileManager/FileManager.vue') },
     {name: 'Bill',                 path: '/bill',              component: () => import('@/view/Bill/Bill.vue') },
-    {name: 'BillYearTop5',         path: '/bill/year-top5',    redirect: {name: 'Bill'} },
-    {name: 'BillCandidateList',    path: '/bill/candidates',   redirect: {name: 'Bill'} },
+    {path: '/bill/year-top5',      redirect: {name: 'Bill'} },
+    {path: '/bill/candidates',     redirect: {name: 'Bill'} },
     {name: 'BankCard',             path: '/bank-card',         component: () => import('@/view/BankCard/BankCardList.vue')  },
     {name: 'NotFound',             path: '/:pathMatch(.*)*',   component: NotFound_404}
 ]

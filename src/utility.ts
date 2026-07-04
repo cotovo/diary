@@ -1,9 +1,7 @@
 import {AuthorizationEntity} from "./entity/Authorization";
-import {BillKey} from "./view/Bill/Bill";
 import {useStatisticStore} from "./pinia/useStatisticStore";
 import Moment from "moment";
 const AUTHORIZATION_NAME = 'Authorization' // 存储用户信息的 localStorage name，跟 Manager 通用
-const BILL_KEYS_NAME = 'BillKeys'
 
 /**
  *  AUTHORIZATION
@@ -28,7 +26,6 @@ function notifyAuthSessionChanged() {
 
 export function deleteAuthorization() {
     localStorage.removeItem(AUTHORIZATION_NAME)
-    removeBillKeys()
     notifyAuthSessionChanged()
 }
 export function setAuthorization(auth: AuthorizationEntity) {
@@ -45,33 +42,6 @@ export function setAuthorization(auth: AuthorizationEntity) {
     }))
     notifyAuthSessionChanged()
 }
-
-/**
- * 保存账单常用项目列表
- * @param keyArray
- */
-export function setBillKeys(keyArray: BillKey[]) {
-    localStorage.setItem(BILL_KEYS_NAME, JSON.stringify(keyArray))
-}
-
-/**
- * 获取账单常用项目列表
- */
-export function getBillKeys(): Array<BillKey> {
-    let keysString = localStorage.getItem(BILL_KEYS_NAME)
-    if (keysString) {
-        return JSON.parse(keysString)
-    } else {
-        return []
-    }
-}
-
-export function removeBillKeys() {
-    localStorage.removeItem(BILL_KEYS_NAME)
-}
-
-
-
 
 /**
  * Prompt 提示

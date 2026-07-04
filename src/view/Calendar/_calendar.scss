@@ -6,7 +6,7 @@
     display: flex;
     justify-content: flex-start;
     overflow-y: auto;
-    background-color: $bg-light;
+    background-color: var(--diary-bg);
 }
 
 // 日历本体
@@ -19,6 +19,8 @@
 // 日历操作面板
 .calendar-operation-panel{
     flex-grow: 1;
+    border-left: 1px solid var(--diary-border);
+    background: var(--diary-surface);
 }
 
 // 日历日记列表弹窗
@@ -43,21 +45,28 @@
 
 // 日历日记列表
 .calendar-diary-list{
-    background-color: $bg-light;
-    border-left: 1px solid $color-border;
-    border-right: 1px solid $color-border;
+    background-color: var(--diary-surface);
+    border-left: 1px solid var(--diary-border);
+    border-right: 1px solid var(--diary-border);
     padding: 20px;
     width: 500px;
     overflow-y: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-    .calendar-container{
-        background-color: $dark-bg;
+@media (max-width: $grid-separate-width-sm) {
+    .calendar-container {
+        flex-direction: column;
     }
-    .calendar-diary-list{
-        background-color: $dark-bg;
-        border-left-color: $dark-border;
-        border-right-color: $dark-border;
+
+    .calendar {
+        padding: 12px;
+    }
+
+    .calendar-operation-panel,
+    .calendar-diary-list {
+        width: 100%;
+        border-left: 0;
+        border-right: 0;
+        border-top: 1px solid var(--diary-border);
     }
 }

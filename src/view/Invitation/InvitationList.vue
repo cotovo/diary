@@ -1,107 +1,146 @@
 <template>
-    <PageHeader title="邀请码" subtitle="点击可复制">
-        <TabIcon v-if="projectStore.isAdminUser" @click="generateNewInvitationCode" icon="添加"/>
+    <PageHeader title="邀请码" subtitle="管理注册入口">
+        <NButton v-if="projectStore.isAdminUser" type="primary" size="small" :loading="isGenerating" @click="generateNewInvitationCode">
+            <template #icon><Plus :size="16"/></template>
+            新建
+        </NButton>
     </PageHeader>
 
     <MenuPanelContainer>
-        <div v-if="isLoading" class="pt-8 pb-8" :style="`height:  ${projectStore.insets.heightPanel}px`">
+        <div v-if="isLoading" class="invitation-loading">
             <Loading :loading="isLoading"/>
         </div>
 
-        <div v-else class="invitation-list" >
-            <div :class="['invitation-list-item', {shared: item.is_shared === 1}]"
-                 v-for="(item,index) in invitationList" :key="item.id">
+        <div v-else-if="invitationList.length > 0" class="invitation-list">
+            <article
+                v-for="(item, index) in invitationList"
+                :key="item.id"
+                :class="['invitation-card', {shared: item.is_shared === 1}]"
+            >
                 <div class="index">{{ index + 1 }}</div>
                 <div class="invitation-code-wrapper">
-                    <div
-                        class="invitation-code"
-                        :data-clipboard="`邀请码（时效7天）：\n\n${item.id}`"
-                    >{{ item.id }}
-                    </div>
-                    <div class="create-time">{{item.date_create}}</div>
-
+                    <button class="invitation-code" type="button" @click="copyInvitationCode(item.id)">
+                        {{ item.id }}
+                    </button>
+                    <div class="create-time">创建于 {{ item.date_create }}</div>
                 </div>
+                <NTag :type="item.is_shared === 1 ? 'success' : 'default'" :bordered="false">
+                    {{ item.is_shared === 1 ? '已分享' : '未分享' }}
+                </NTag>
                 <div class="operation-btns" v-if="projectStore.isAdminUser">
-                    <TabIcon icon="黑色-关闭" @click="deleteInvitationCode(item.id)"/>
-                    <TabIcon v-if="item.is_shared === 0" icon="黑色-确定" @click="markAsShared(item.id)"/>
+                    <NButton
+                        v-if="item.is_shared === 0"
+                        quaternary
+                        circle
+                        size="small"
+                        aria-label="标记已分享"
+                        @click="markAsShared(item.id)"
+                    >
+                        <template #icon><Check :size="16"/></template>
+                    </NButton>
+                    <NButton
+                        quaternary
+                        circle
+                        size="small"
+                        type="error"
+                        aria-label="删除邀请码"
+                        @click="deleteInvitationCode(item.id)"
+                    >
+                        <template #icon><Trash2 :size="16"/></template>
+                    </NButton>
                 </div>
-            </div>
+            </article>
         </div>
+
+        <ModernEmptyState
+            v-else
+            title="还没有邀请码"
+            description="生成邀请码后，新用户可以用它完成注册。"
+            :icon="Ticket"
+        />
     </MenuPanelContainer>
 </template>
 
 <script lang="ts" setup>
 import Loading from "@/components/Loading.vue"
-import TabIcon from "@/components/TabIcon.vue"
 import PageHeader from "@/framework/pageHeader/PageHeader.vue"
-
-import ClipboardJS from "clipboard"
 import invitationApi from "@/api/invitationApi.ts";
 import {popMessage, dateFormatter} from "@/utility.ts";
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
-const projectStore = useProjectStore()
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {InvitationEntity} from "./InvitationEntity.ts";
 import MenuPanelContainer from "@/framework/MenuPanelContainer.vue";
+import ModernEmptyState from "@/components/ui/ModernEmptyState.vue";
+import {NButton, NTag, useDialog} from "naive-ui";
+import {Check, Plus, Ticket, Trash2} from "@lucide/vue";
+
+const projectStore = useProjectStore()
+const dialog = useDialog()
 
 const isLoading = ref(false)
+const isGenerating = ref(false)
 const invitationList = ref<Array<InvitationEntity>>([])
-const clipboard = ref(null) // clipboard obj
 
-onMounted(()=>{
-    // 只在第一次请求的时候显示载入 loading
+onMounted(() => {
     isLoading.value = true
     getInvitationList()
-    // 绑定剪贴板操作方法
-    clipboard.value = new ClipboardJS('.invitation-code', {
-        text: trigger => {
-            return trigger.getAttribute('data-clipboard')
-        },
-    })
-    clipboard.value.on('success', ()=>{  // 还可以添加监听事件，如：复制成功后提示
-        popMessage('success', '邀请码已复制到剪贴板', null, 2)
-    })
-})
-onBeforeUnmount(()=>{
-    clipboard.value && clipboard.value.destroy()
 })
 
-function getInvitationList(){
+async function copyInvitationCode(invitationId: string) {
+    try {
+        await navigator.clipboard.writeText(`邀请码（时效7天）：\n\n${invitationId}`)
+        popMessage('success', '邀请码已复制到剪贴板', null, 2)
+    } catch {
+        popMessage('danger', '复制失败')
+    }
+}
+
+function getInvitationList() {
     invitationApi
         .list()
         .then(res => {
             isLoading.value = false
-            if (res.data) {
-                invitationList.value = res.data.map(item => {
-                    item.date_create = dateFormatter(new Date(item.date_create))
-                    return item
-                })
-            } else {
-                // 没有设置任何银行卡信息
-            }
+            invitationList.value = (res.data || []).map((item: InvitationEntity) => ({
+                ...item,
+                date_create: dateFormatter(new Date(item.date_create))
+            }))
         })
         .catch(() => {
             isLoading.value = false
         })
 }
-// 生成新的邀请码
-function generateNewInvitationCode(){
-    invitationApi.generate().then(() => getInvitationList())
-}
 
-// 删除邀请码
-function deleteInvitationCode(invitationId: number | string){
+function generateNewInvitationCode() {
+    isGenerating.value = true
     invitationApi
-        .delete({
-            id: invitationId
-        })
-        .then(res => {
-            popMessage('success', res.message, null)
+        .generate()
+        .then(() => {
+            popMessage('success', '邀请码已生成')
             getInvitationList()
         })
+        .finally(() => {
+            isGenerating.value = false
+        })
 }
-// 邀请码为已分享状态
-function markAsShared(invitationId: number | string){
+
+function deleteInvitationCode(invitationId: number | string) {
+    dialog.warning({
+        title: '删除邀请码',
+        content: '删除后这个邀请码将无法继续用于注册。',
+        positiveText: '删除',
+        negativeText: '取消',
+        onPositiveClick: () => {
+            invitationApi
+                .delete({id: invitationId})
+                .then(res => {
+                    popMessage('success', res.message, null)
+                    getInvitationList()
+                })
+        }
+    })
+}
+
+function markAsShared(invitationId: number | string) {
     invitationApi
         .markAsShared({
             id: invitationId
@@ -114,123 +153,86 @@ function markAsShared(invitationId: number | string){
 </script>
 
 <style scoped lang="scss">
-@use "sass:color" as color;
-@use "../../scss/plugin" as *;
+.invitation-loading {
+    padding: 32px 0;
+}
 
-.invitation-container{
-    padding: 30px;
-    overflow-y: auto;
-    background-color: $bg-menu;
-    border-radius: $radius-whole-ui;
+.invitation-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.invitation-card {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--diary-border);
+    border-radius: var(--diary-radius);
+    background: var(--diary-surface);
+    box-shadow: var(--diary-hairline-shadow);
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+
+    &.shared {
+        border-color: rgba(52, 199, 89, 0.34);
+        background: rgba(52, 199, 89, 0.08);
+    }
+}
+
+.index {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--diary-radius);
+    background: var(--diary-surface-muted);
+    color: var(--diary-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.invitation-code-wrapper {
+    min-width: 0;
+}
+
+.invitation-code {
+    appearance: none;
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--diary-accent);
+    cursor: pointer;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
 }
-.invitation-list{
+
+.create-time {
+    margin-top: 2px;
+    color: var(--diary-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.operation-btns {
+    grid-column: 1 / -1;
     display: flex;
-    justify-content: flex-start;
-    flex-flow: row wrap;
-    &-item{
-        font-family: "JetBrainsMonoDiary", "SF UI Display", "PingFang SC", "Microsoft Yahei UI", "Microsoft Yahei", "Helvetica", sans-serif;
-        transition: all 0.3s;
-        align-items: center;
-        margin-right: 15px;
-        margin-bottom: 15px;
-        padding: 10px;
-        background-color: white;
-        border-radius: $radius-pc;
-        border: 1px solid white;
-        display: flex;
-        flex-flow: row nowrap;
-        .index{
-            flex-shrink: 0;
-            width: 30px;
-            text-align: center;
-            color: $magenta;
-            font-size: $fz-title;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .invitation-code-wrapper{
-            padding-right: 10px;
-            flex-grow: 1;
-            .invitation-code{
-                @extend .btn-like;
-                overflow: hidden;
-                font-size: $fz-title;
-            }
-            .create-time{
-                font-size: $fz-small;
-                color: $text-content;
-            }
-        }
-
-        .operation-btns{
-            display: flex;
-            flex-flow: row nowrap;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        &.shared{
-            background: linear-gradient(color.adjust($green, $lightness: 15%), $green);
-            border-top-color: color.adjust($green, $lightness: 15%);
-            border-bottom-color: $green;
-            border-left-color: $green;
-            border-right-color: $green;
-        }
-    }
+    justify-content: flex-end;
+    gap: 4px;
 }
 
-// MOBILE
-@media (max-width: $grid-separate-width-sm) {
-    .invitation-container{
-        padding: 20px 15px;
-    }
-    .invitation-list-item{
-        margin-right: 0;
-        width: 100%;
-        padding: 15px;
-    }
-}
-
-// DARK
-@media (prefers-color-scheme: dark) {
-    .invitation-container{
-        background-color: $dark-bg;
-    }
+@media (max-width: 760px) {
     .invitation-list {
-        display: flex;
-        justify-content: flex-start;
-        flex-flow: row wrap;
-
-        &-item {
-            background-color: $dark-bg-dark;
-            border-color: $dark-border;
-            .index{
-                color: white;
-            }
-            .invitation-code-wrapper {
-                .invitation-code{
-                    color: $color-main;
-                }
-                .create-time{
-                    color: $color-main;
-                }
-            }
-            &.shared{
-                .index{
-                    color: $text-content;
-                }
-                .invitation-code-wrapper {
-                    .invitation-code{
-                        color: $text-content;
-                    }
-                    .create-time{
-                        color: $text-content;
-                    }
-                }
-
-            }
-        }
+        grid-template-columns: 1fr;
     }
 }
-
 </style>

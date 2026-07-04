@@ -35,11 +35,11 @@
             </div>
 
             <!-- 操作面板 -->
-            <div class="calendar-operation-panel p-4">
-                <ButtonSmall 
-                    v-if="periodDiary?.id" 
-                    @click="router.push({name: 'Edit', params: {id: periodDiary.id}})" 
-                    class="mb-2">编辑经期日历</ButtonSmall>
+            <div class="calendar-operation-panel p-4" v-if="periodDiary?.id">
+                <NButton type="primary" secondary @click="router.push({name: 'Edit', params: {id: periodDiary.id}})">
+                    <template #icon><Pencil :size="16"/></template>
+                    编辑经期日历
+                </NButton>
             </div>
 
             <div class="calendar-operation-panel" v-if="calendarCol === 1">
@@ -60,7 +60,8 @@ import {Calendar} from 'v-calendar';
 import diaryApi from "@/api/diaryApi.ts";
 import {EntityDiaryForm} from "@/view/DiaryList/Diary.ts";
 import {storeToRefs} from "pinia";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import {NButton} from "naive-ui";
+import {Pencil} from "@lucide/vue";
 import {CalendarAttribute, CalendarEntity} from "@/view/Calendar/VCalendar.ts";
 import Moment from "moment";
 import Edit from "@/view/Edit/Edit.vue";
