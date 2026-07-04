@@ -43,8 +43,11 @@
                 <header class="meta-panel-header">
                     <div>
                         <span>写作检查器</span>
-                        <p>日期、分类、心情与天气</p>
+                        <p>整理这篇日记的时间、状态和环境</p>
                     </div>
+                    <span class="meta-status-pill" :class="{changed: diaryHasChanged}">
+                        {{ diaryHasChanged ? '未保存' : '已同步' }}
+                    </span>
                 </header>
 
                 <section class="context-block date-context-section">
@@ -88,7 +91,7 @@
                     <div class="context-section-header">
                         <h3>写作设置</h3>
                     </div>
-                    <NForm label-placement="left" label-width="92" :show-feedback="false">
+                    <NForm class="settings-form" label-placement="left" label-width="82" :show-feedback="false">
                         <NFormItem label="公开分享">
                             <NSwitch v-model:value="diary.is_public"/>
                         </NFormItem>

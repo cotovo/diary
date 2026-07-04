@@ -38,3 +38,23 @@ const moodOptions = [
     {label: '感激', value: 'grateful'},
 ]
 </script>
+
+<style lang="scss" scoped>
+.mood-tag-picker {
+    :deep(.n-form-item) {
+        margin-bottom: 8px;
+    }
+
+    :deep(.n-form-item-label) {
+        min-height: 22px;
+        padding-bottom: 4px;
+        color: var(--diary-muted);
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+    :deep(.n-dynamic-tags) {
+        row-gap: 6px;
+    }
+}
+</style>

@@ -942,29 +942,153 @@ function mapQWeatherCode(code) {
   return "sunny";
 }
 
+function mapOpenMeteoWeatherCode(code) {
+  const value = Number(code);
+  if ([0, 1].includes(value)) return "sunny";
+  if ([2].includes(value)) return "cloudy";
+  if ([3].includes(value)) return "overcast";
+  if ([45, 48].includes(value)) return "fog";
+  if ([51, 53, 55, 56, 57].includes(value)) return "sprinkle";
+  if ((value >= 61 && value <= 67) || (value >= 80 && value <= 82)) return "rain";
+  if ([95, 96, 99].includes(value)) return "thunderstorm";
+  if ((value >= 71 && value <= 77) || (value >= 85 && value <= 86)) return "snow";
+  return "sunny";
+}
+
+function openMeteoWeatherText(code) {
+  const value = Number(code);
+  const textMap = new Map([
+    [0, "晴"],
+    [1, "基本晴朗"],
+    [2, "局部多云"],
+    [3, "阴"],
+    [45, "雾"],
+    [48, "雾凇"],
+    [51, "小毛毛雨"],
+    [53, "毛毛雨"],
+    [55, "强毛毛雨"],
+    [56, "冻毛毛雨"],
+    [57, "强冻毛毛雨"],
+    [61, "小雨"],
+    [63, "中雨"],
+    [65, "大雨"],
+    [66, "冻雨"],
+    [67, "强冻雨"],
+    [71, "小雪"],
+    [73, "中雪"],
+    [75, "大雪"],
+    [77, "雪粒"],
+    [80, "阵雨"],
+    [81, "中等阵雨"],
+    [82, "强阵雨"],
+    [85, "阵雪"],
+    [86, "强阵雪"],
+    [95, "雷雨"],
+    [96, "雷雨伴小冰雹"],
+    [99, "雷雨伴冰雹"],
+  ]);
+  return textMap.get(value) || "天气未知";
+}
+
+function windDirectionText(degrees) {
+  const value = Number(degrees);
+  if (!Number.isFinite(value)) return "";
+  const directions = ["北风", "东北风", "东风", "东南风", "南风", "西南风", "西风", "西北风"];
+  return directions[Math.round(value / 45) % 8];
+}
+
+function formatOpenMeteoPlace(place) {
+  if (!place) return "";
+  return [place.name, place.admin2, place.admin1, place.country].filter(Boolean).join(" · ");
+}
+
 async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`天气服务请求失败：${response.status}`);
   return response.json();
 }
 
+async function resolveDiaryContextWithOpenMeteo(input = {}) {
+  const city = String(input.city || "").trim();
+  let lon = input.longitude ?? input.lon;
+  let lat = input.latitude ?? input.lat;
+  let place = null;
+
+  if (city) {
+    const searchUrl = new URL("https://geocoding-api.open-meteo.com/v1/search");
+    searchUrl.searchParams.set("name", city);
+    searchUrl.searchParams.set("count", "1");
+    searchUrl.searchParams.set("language", "zh");
+    searchUrl.searchParams.set("format", "json");
+    const geo = await fetchJson(searchUrl);
+    place = Array.isArray(geo.results) && geo.results.length > 0 ? geo.results[0] : null;
+    if (!place) throw new Error("没有找到这个城市，请换个城市名试试");
+    lon = place.longitude;
+    lat = place.latitude;
+  }
+
+  const hasCoordinates = lon !== undefined && lon !== null && lat !== undefined && lat !== null && lon !== "" && lat !== "";
+  if (!hasCoordinates) {
+    throw new Error("缺少城市或经纬度");
+  }
+
+  if (!place) {
+    try {
+      const reverseUrl = new URL("https://geocoding-api.open-meteo.com/v1/reverse");
+      reverseUrl.searchParams.set("latitude", String(lat));
+      reverseUrl.searchParams.set("longitude", String(lon));
+      reverseUrl.searchParams.set("language", "zh");
+      reverseUrl.searchParams.set("count", "1");
+      const reverse = await fetchJson(reverseUrl);
+      place = Array.isArray(reverse.results) && reverse.results.length > 0 ? reverse.results[0] : null;
+    } catch {
+      place = null;
+    }
+  }
+
+  const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
+  forecastUrl.searchParams.set("latitude", String(lat));
+  forecastUrl.searchParams.set("longitude", String(lon));
+  forecastUrl.searchParams.set("current", "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m");
+  forecastUrl.searchParams.set("timezone", "auto");
+  const forecast = await fetchJson(forecastUrl);
+  const current = forecast.current || {};
+  const weatherCode = current.weather_code ?? "";
+  const windDir = windDirectionText(current.wind_direction_10m);
+  const windSpeed = current.wind_speed_10m === undefined ? "" : `${Math.round(Number(current.wind_speed_10m))} km/h`;
+
+  return {
+    locationName: formatOpenMeteoPlace(place) || city || [Number(lat).toFixed(4), Number(lon).toFixed(4)].join(", "),
+    longitude: String(place?.longitude ?? lon ?? ""),
+    latitude: String(place?.latitude ?? lat ?? ""),
+    weather: mapOpenMeteoWeatherCode(weatherCode),
+    weatherText: openMeteoWeatherText(weatherCode),
+    weatherCode: String(weatherCode),
+    temperatureOutside: current.temperature_2m === undefined ? "" : String(Math.round(Number(current.temperature_2m))),
+    humidity: current.relative_humidity_2m === undefined ? "" : `${current.relative_humidity_2m}%`,
+    windText: [windDir, windSpeed].filter(Boolean).join(" "),
+    contextUpdatedAt: new Date().toISOString(),
+  };
+}
+
 async function resolveDiaryContext(input = {}) {
   const config = await readConfig();
   const host = String(config.systemConfig.hefeng_weather_api_host || "").trim();
   const key = String(config.systemConfig.hefeng_weather_api_key || "").trim();
-  if (!host || !key) {
-    throw new Error("请先在系统设置中配置和风天气 Host 和 API Key");
-  }
   const city = String(input.city || "").trim();
   const lon = input.longitude ?? input.lon;
   const lat = input.latitude ?? input.lat;
-  const location = city || (lon && lat ? `${lon},${lat}` : "");
+  const location = city || (lon !== undefined && lat !== undefined && lon !== "" && lat !== "" ? `${lon},${lat}` : "");
   if (!location) {
     throw new Error("缺少城市或经纬度");
   }
+  if (!host || !key) {
+    return resolveDiaryContextWithOpenMeteo(input);
+  }
 
   let place = null;
-  const geoUrl = new URL(`https://${host}/geo/v2/city/lookup`);
+  const normalizedHost = host.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const geoUrl = new URL(`https://${normalizedHost}/geo/v2/city/lookup`);
   geoUrl.searchParams.set("key", key);
   geoUrl.searchParams.set("location", location);
   geoUrl.searchParams.set("number", "1");
@@ -973,7 +1097,7 @@ async function resolveDiaryContext(input = {}) {
     place = geo.location[0];
   }
   const weatherLocation = place ? `${place.lon},${place.lat}` : location;
-  const weatherUrl = new URL(`https://${host}/v7/weather/now`);
+  const weatherUrl = new URL(`https://${normalizedHost}/v7/weather/now`);
   weatherUrl.searchParams.set("key", key);
   weatherUrl.searchParams.set("location", weatherLocation);
   const weather = await fetchJson(weatherUrl);
