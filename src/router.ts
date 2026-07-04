@@ -48,16 +48,9 @@ const routes: RouteRecordRaw[] = [
         ]
     },
     {name: 'Share',                path: '/share/:id',         component: () => import('@/view/Share/Share.vue')},
-    {name: 'ChangePassword',       path: '/change-password',   component: () => import('@/view/Login&Register/ChangePassword.vue') },
-    {name: 'ChangeProfile',        path: '/change-profile',    component: () => import('@/view/ChangeProfile/ChangeProfile.vue') },
     {name: 'SystemConfig',         path: '/system-config',      component: () => import('@/view/SystemConfig/SystemConfigPage.vue'), meta: {requiresAdmin: true} },
     {name: 'Login',                path: '/login',             component: Login},
     {name: 'Statistics',           path: '/statistics',        component: () => import('@/view/Statistics/StatisticsIndex.vue') },
-    {name: 'FileManager',          path: '/file-manager',      component: () => import('@/view/FileManager/FileManager.vue') },
-    {name: 'Bill',                 path: '/bill',              component: () => import('@/view/Bill/Bill.vue') },
-    {path: '/bill/year-top5',      redirect: {name: 'Bill'} },
-    {path: '/bill/candidates',     redirect: {name: 'Bill'} },
-    {name: 'BankCard',             path: '/bank-card',         component: () => import('@/view/BankCard/BankCardList.vue')  },
     {name: 'NotFound',             path: '/:pathMatch(.*)*',   component: NotFound_404}
 ]
 

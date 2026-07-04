@@ -25,7 +25,7 @@ import chartOption from "@/view/Statistics/chartOption.ts";
 
 const statisticStore = useStatisticStore()
 
-// 注册必须的组件
+// 按需加载图表组件
 echarts.use([
     TitleComponent,
     TooltipComponent,

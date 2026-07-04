@@ -147,7 +147,7 @@
                 <span>日记</span>
             </div>
 
-            <div class="nav-part-right">
+            <div :class="['nav-part-right', { 'editing-actions': isEditingRoute }]">
                 <Clock class="nav-clock" v-if="!projectStore.isInMobileMode && projectStore.insets.windowsWidth > 1550"/>
 
                 <div class="nav-action-group" v-if="route.name === 'Detail' && projectStore.currentDiary">
@@ -184,7 +184,7 @@
                     </NButton>
                 </div>
 
-                <div class="nav-action-group" v-if="isEditingRoute">
+                <div class="nav-action-group editor-action-group" v-if="isEditingRoute">
                     <NButton
                         v-if="projectStore.isDiaryEditorContentHasChanged"
                         quaternary
@@ -199,7 +199,7 @@
                     <NButton
                         circle
                         type="primary"
-                        class="nav-icon-button save"
+                        class="nav-icon-button save nav-save-button"
                         :loading="projectStore.isSavingDiary"
                         :class="{ saved: !isNewDiary && !projectStore.isDiaryEditorContentHasChanged }"
                         :title="projectStore.isDiaryEditorContentHasChanged || isNewDiary ? '保存日记' : '已保存'"
@@ -217,7 +217,7 @@
                     v-if="projectStore.isInMobileMode && route.name === 'List' && !projectStore.isMenuShowed"
                     quaternary
                     circle
-                    class="nav-icon-button"
+                    :class="['nav-icon-button', 'nav-add-button', { 'editor-add': isEditingRoute }]"
                     title="分类筛选"
                     aria-label="分类筛选"
                     @click="showMenuCategorySelector"

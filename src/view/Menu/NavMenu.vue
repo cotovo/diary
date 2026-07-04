@@ -15,8 +15,7 @@
                     <header class="menu-brand">
                         <img :src="SVG_ICONS.logo_icons.logo" alt="日记" class="menu-brand-logo">
                         <div>
-                            <p class="menu-kicker">私人日记系统</p>
-                            <h2>今天写点什么</h2>
+                            <h2>日记</h2>
                         </div>
                     </header>
 
@@ -58,17 +57,6 @@
                 <YearSelector v-show="yearShowed"/>
             </transition>
 
-            <transition enter-active-class="animated-fast fadeIn" leave-active-class="animated-fast fadeOut">
-                <MenuOtherFunction v-show="othersShowed"/>
-            </transition>
-
-            <transition enter-active-class="animated-fast fadeIn" leave-active-class="animated-fast fadeOut">
-                <About v-show="aboutShowed"/>
-            </transition>
-
-            <transition enter-active-class="animated-fast fadeIn" leave-active-class="animated-fast fadeOut">
-                <ChangeLog v-show="changeLogShowed"/>
-            </transition>
         </aside>
     </transition>
 </template>
@@ -76,13 +64,9 @@
 <script lang="ts" setup>
 import MenuCategorySelector from "@/view/Menu/MenuCategorySelector/MenuCategorySelector.vue"
 import YearSelector from "./YearSelector/YearSelector.vue"
-import About from "@/view/About/About.vue"
-import packageInfo from "../../../package.json"
 import MenuListItemShort from "@/view/Menu/MenuListItemShort.vue"
 import SVG_ICONS from "@/assets/icons/SVG_ICONS.ts"
 import UserProfile from "@/view/Menu/UserProfile.vue";
-import MenuOtherFunction from "@/view/Menu/MenuOtherFunction/MenuOtherFunction.vue";
-import ChangeLog from "@/view/Menu/ChangeLog/ChangeLog.vue";
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
 import {computed, nextTick, onMounted, ref, watch, type Component} from "vue";
 import {useRouter} from "vue-router";
@@ -92,18 +76,12 @@ import MenuPanelContainer from "@/framework/MenuPanelContainer.vue";
 import {
     BarChart3,
     CalendarDays,
-    CreditCard,
-    Files,
-    FolderOpen,
     LayoutGrid,
     ListTodo,
-    NotebookPen,
     ScrollText,
     Search,
     Settings,
     Tags,
-    WalletCards,
-    Wrench
 } from "@lucide/vue";
 
 type MenuItem = {
@@ -134,15 +112,12 @@ onMounted(() => {
 const menuListShowed = ref(true)
 const categoryShowed = ref(false)
 const yearShowed = ref(false)
-const othersShowed = ref(false)
-const aboutShowed = ref(false)
-const changeLogShowed = ref(false)
 const categoriesSet = ref(new Set())
 
 const menuGroups = computed<MenuGroup[]>(() => [
     {
         name: '写作',
-        description: '日记入口和筛选',
+        description: '记录和查找日记',
         items: [
             {
                 name: '搜索',
@@ -155,7 +130,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
             },
             {
                 name: '类别',
-                description: '筛选日常、工作、灵感等写作分类',
+                description: '筛选日记分类',
                 isShowInMobile: true,
                 isShowInPC: true,
                 isNeedAdmin: false,
@@ -165,7 +140,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
             },
             {
                 name: '待办',
-                description: isTodoFiltered.value ? '返回全部日记' : '只看待办类日记',
+                description: isTodoFiltered.value ? '返回全部日记' : '只看待办日记',
                 isShowInMobile: true,
                 isShowInPC: true,
                 isNeedAdmin: false,
@@ -185,11 +160,11 @@ const menuGroups = computed<MenuGroup[]>(() => [
     },
     {
         name: '回看',
-        description: '浏览和统计',
+        description: '按时间回顾',
         items: [
             {
                 name: '日历',
-                description: '按日期查看写作痕迹',
+                description: '按日期查看日记',
                 isShowInMobile: true,
                 isShowInPC: true,
                 isNeedAdmin: false,
@@ -198,7 +173,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
             },
             {
                 name: '统计',
-                description: '查看写作、天气和趋势',
+                description: '查看写作趋势',
                 isShowInMobile: true,
                 isShowInPC: true,
                 isNeedAdmin: false,
@@ -207,7 +182,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
             },
             {
                 name: '瀑布',
-                description: '以卡片流回看日记',
+                description: '卡片流浏览',
                 isShowInMobile: true,
                 isShowInPC: true,
                 isNeedAdmin: false,
@@ -217,78 +192,17 @@ const menuGroups = computed<MenuGroup[]>(() => [
         ]
     },
     {
-        name: '独立模块',
-        description: '不再混进正文',
-        items: [
-            {
-                name: '账单',
-                description: '结构化记录收支，不占用日记分类',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: false,
-                icon: CreditCard,
-                onClick: () => goToPage('Bill')
-            },
-            {
-                name: '银行卡',
-                description: '加密保险箱，默认脱敏显示',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: false,
-                icon: WalletCards,
-                onClick: () => goToPage('BankCard')
-            }
-        ]
-    },
-    {
         name: '系统',
-        description: '维护与资料',
+        description: '备份和维护',
         items: [
-            {
-                name: '文件',
-                description: '管理上传文件',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: true,
-                icon: FolderOpen,
-                onClick: () => goToPage('FileManager')
-            },
             {
                 name: '设置',
-                description: '备份、迁移、天气服务',
+                description: '备份、天气和数据维护',
                 isShowInMobile: true,
                 isShowInPC: true,
                 isNeedAdmin: true,
                 icon: Settings,
                 onClick: () => goToPage('SystemConfig')
-            },
-            {
-                name: '其它',
-                description: '导出与密码维护',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: false,
-                icon: Wrench,
-                onClick: () => menuListClicked('others')
-            },
-            {
-                name: '更新日志',
-                description: '查看版本变化',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: false,
-                icon: Files,
-                onClick: () => menuListClicked('changeLog')
-            },
-            {
-                name: '关于',
-                description: '应用信息',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: false,
-                icon: NotebookPen,
-                addOnText: `v${packageInfo.version}`,
-                onClick: () => menuListClicked('about')
             }
         ]
     }
@@ -339,23 +253,12 @@ function menuShow() {
     menuListShowed.value = true
     categoryShowed.value = false
     yearShowed.value = false
-    othersShowed.value = false
-    aboutShowed.value = false
-    changeLogShowed.value = false
 }
 
 function menuClose() {
     if (categoryShowed.value || yearShowed.value) {
         projectStore.isListNeedBeReload = true
         menuInit()
-    } else if (aboutShowed.value || changeLogShowed.value || othersShowed.value) {
-        projectStore.isMenuShowed = true
-        menuListShowed.value = true
-        categoryShowed.value = false
-        yearShowed.value = false
-        othersShowed.value = false
-        aboutShowed.value = false
-        changeLogShowed.value = false
     } else if (projectStore.isMenuShowed) {
         menuInit()
     }
@@ -366,19 +269,13 @@ function menuInit() {
     menuListShowed.value = true
     categoryShowed.value = false
     yearShowed.value = false
-    othersShowed.value = false
-    aboutShowed.value = false
-    changeLogShowed.value = false
 }
 
-function showSubPanel(panel: 'category' | 'year' | 'others' | 'about' | 'changeLog') {
+function showSubPanel(panel: 'category' | 'year') {
     projectStore.isMenuShowed = true
     menuListShowed.value = false
     categoryShowed.value = panel === 'category'
     yearShowed.value = panel === 'year'
-    othersShowed.value = panel === 'others'
-    aboutShowed.value = panel === 'about'
-    changeLogShowed.value = panel === 'changeLog'
 }
 
 function menuListClicked(menuName: string) {
@@ -399,15 +296,6 @@ function menuListClicked(menuName: string) {
             break
         case 'year':
             showSubPanel('year')
-            break
-        case 'others':
-            showSubPanel('others')
-            break
-        case 'about':
-            showSubPanel('about')
-            break
-        case 'changeLog':
-            showSubPanel('changeLog')
             break
         default:
             break

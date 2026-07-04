@@ -37,10 +37,24 @@
   flex: 0 0 auto;
   justify-content: flex-end;
   gap: 4px;
+
+  &.editing-actions {
+    gap: 8px;
+  }
 }
 
 .nav-action-group {
   gap: 4px;
+
+  &.editor-action-group {
+    height: 36px;
+    padding: 3px;
+    gap: 3px;
+    border: 1px solid var(--diary-border);
+    border-radius: 8px;
+    background: var(--diary-surface);
+    box-shadow: var(--diary-hairline-shadow);
+  }
 }
 
 .nav-icon-button {
@@ -67,12 +81,36 @@
 
   &.save {
     color: #fff;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    box-shadow: 0 6px 14px rgba(0, 122, 255, 0.22);
 
     &.saved {
       background: var(--diary-success);
       border-color: var(--diary-success);
+      box-shadow: 0 6px 14px rgba(52, 199, 89, 0.18);
     }
   }
+}
+
+.nav-add-button.editor-add {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 8px;
+  color: var(--diary-muted);
+
+  &:hover {
+    background: var(--diary-surface-muted);
+    color: var(--diary-accent);
+  }
+}
+
+.nav-save-button :deep(.n-button__border),
+.nav-save-button :deep(.n-button__state-border) {
+  border-radius: 8px;
 }
 
 .nav-logo-button {
@@ -214,6 +252,17 @@
     min-width: 38px;
   }
 
+  .nav-action-group.editor-action-group {
+    height: 38px;
+  }
+
+  .nav-icon-button.nav-save-button,
+  .nav-add-button.editor-add {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+
   #toast .toast {
     left: 50% !important;
     top: 50% !important;
@@ -224,5 +273,9 @@
 @media (prefers-color-scheme: dark) {
   .navbar {
     background: rgba(28, 28, 30, 0.9);
+  }
+
+  .nav-action-group.editor-action-group {
+    background: rgba(44, 44, 46, 0.92);
   }
 }

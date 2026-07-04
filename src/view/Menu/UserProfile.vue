@@ -4,7 +4,7 @@
             <div class="avatar">
                 <img
                     v-if="userInfo?.avatar"
-                    :src="`${userInfo.avatar}-${projectConfig.qiniu_style_suffix}`"
+                    :src="userInfo.avatar"
                     alt="用户头像"
                 >
                 <img v-else :src="SVG_ICONS.logo_icons.logo_avatar" alt="默认头像">
@@ -22,7 +22,6 @@
         </div>
 
         <div class="profile-actions">
-            <NButton size="small" tertiary @click="changeProfile">资料</NButton>
             <NButton size="small" tertiary type="error" @click="logout">退出</NButton>
             <span class="version">v{{ packageInfo.version }}</span>
         </div>
@@ -39,25 +38,17 @@ import {useRouter} from "vue-router";
 import packageInfo from "../../../package.json";
 import {useStatisticStore} from "@/pinia/useStatisticStore.ts";
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
-import {useSystemConfigStore} from "@/pinia/useSystemConfigStore.ts";
 import {NButton} from "naive-ui";
 
 const statisticStore = useStatisticStore()
 const projectStore = useProjectStore()
 const {authRevision} = storeToRefs(projectStore)
-const systemConfigStore = useSystemConfigStore()
 const router = useRouter()
-const projectConfig = computed(() => systemConfigStore.config)
 
 const userInfo = computed(() => {
     void authRevision.value
     return getAuthorization()
 })
-
-function changeProfile() {
-    projectStore.isMenuShowed = false
-    router.push({name: 'ChangeProfile'})
-}
 
 function logout() {
     userApi.logout().finally(() => {

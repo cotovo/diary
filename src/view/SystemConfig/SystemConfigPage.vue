@@ -1,8 +1,8 @@
 <template>
     <ModernPage
-        eyebrow="Single user diary"
+        eyebrow="Diary"
         title="系统设置"
-        description="管理私人日记的登录安全、天气服务和本地文件数据。所有内容仍保存在服务器磁盘，便于备份和迁移。"
+        description="管理登录、天气、备份和日记文件。"
     >
         <template #actions>
             <NButton @click="router.go(-1)">返回</NButton>
@@ -14,24 +14,8 @@
         <div class="modern-grid">
             <section class="modern-panel">
                 <div class="modern-panel-header">
-                    <h2>账号安全</h2>
-                    <p>单人系统只保留管理员口令，不开放注册、邀请码和演示账号。</p>
-                </div>
-                <div class="modern-panel-body settings-actions">
-                    <NAlert type="info" :bordered="false">
-                        当前版本使用服务端密码哈希与 Cookie session。公网部署前请确认 `.env` 中已设置强密码哈希和 `SESSION_SECRET`。
-                    </NAlert>
-                    <NButton type="primary" secondary @click="goToChangePassword">
-                        <template #icon><KeyRound :size="18"/></template>
-                        修改登录密码
-                    </NButton>
-                </div>
-            </section>
-
-            <section class="modern-panel">
-                <div class="modern-panel-header">
                     <h2>天气服务</h2>
-                    <p>配置和风天气后，新建今天的日记时可以自动带入室外天气和温度。</p>
+                    <p>可选。留空时使用免费的 Open-Meteo 服务。</p>
                 </div>
                 <div class="modern-panel-body">
                     <NSpin :show="isLoading">
@@ -42,7 +26,7 @@
                                         v-model:value="form.hefeng_weather_api_key"
                                         type="password"
                                         show-password-on="click"
-                                        placeholder="可留空"
+                                        placeholder="可留空，自动使用免费天气"
                                     />
                                 </NFormItemGi>
                                 <NFormItemGi label="和风天气 Host">
@@ -60,7 +44,7 @@
             <section class="modern-panel">
                 <div class="modern-panel-header">
                     <h2>数据与备份</h2>
-                    <p>日记以 Markdown 文件保存，索引用 JSON 维护。这里可以检查数据状态、手动备份和完整导出。</p>
+                    <p>查看日记文件状态，手动备份或导出。</p>
                 </div>
                 <div class="modern-panel-body">
                     <NSpin :show="isStorageLoading">
@@ -82,8 +66,6 @@
                                 <NDescriptionsItem label="索引文件">{{ storageStatus.indexPath }}</NDescriptionsItem>
                                 <NDescriptionsItem label="备份目录">{{ storageStatus.backupsDir }}</NDescriptionsItem>
                                 <NDescriptionsItem label="回收站目录">{{ storageStatus.trashDir }}</NDescriptionsItem>
-                                <NDescriptionsItem label="保险箱数据">{{ storageStatus.vaultCardsPath }}</NDescriptionsItem>
-                                <NDescriptionsItem label="账单数据">{{ storageStatus.financeTransactionsPath }}</NDescriptionsItem>
                                 <NDescriptionsItem label="最新备份">
                                     {{ storageStatus.latestBackup || '暂无备份' }}
                                 </NDescriptionsItem>
@@ -100,7 +82,7 @@
                                 </NButton>
                                 <NButton type="primary" secondary :loading="isExporting" @click="exportFullDiary">
                                     <template #icon><Download :size="18"/></template>
-                                    完整导出 JSON
+                                    导出日记
                                 </NButton>
                                 <NButton quaternary @click="loadStorageStatus">
                                     <template #icon><RefreshCw :size="18"/></template>
@@ -126,7 +108,7 @@
             <section class="modern-panel">
                 <div class="modern-panel-header">
                     <h2>智能维护</h2>
-                    <p>处理复杂边界：误删恢复、索引与 Markdown 文件不一致、备份前置保护。</p>
+                    <p>恢复误删日记，修复索引和文件不一致。</p>
                 </div>
                 <div class="modern-panel-body storage-stack">
                     <NAlert type="success" :bordered="false">
@@ -169,25 +151,6 @@
                 </div>
             </section>
 
-            <section class="modern-panel">
-                <div class="modern-panel-header">
-                    <h2>旧数据迁移</h2>
-                    <p>扫描旧的“我的银行卡列表”日记和 bill 分类日记，导入到新的保险箱和账单模块。导入前会自动备份。</p>
-                </div>
-                <div class="modern-panel-body storage-stack">
-                    <div class="settings-actions">
-                        <NButton :loading="isPreviewingMigration" @click="previewMigration">
-                            迁移预览
-                        </NButton>
-                        <NButton type="primary" secondary :disabled="!migrationPreview" :loading="isImportingMigration" @click="confirmImportMigration">
-                            导入旧数据
-                        </NButton>
-                    </div>
-                    <NAlert v-if="migrationPreview" type="info" :bordered="false">
-                        可导入 {{ migrationPreview.cards.length }} 张银行卡、{{ migrationPreview.transactions.length }} 条账单。
-                    </NAlert>
-                </div>
-            </section>
         </div>
     </ModernPage>
 </template>
@@ -209,10 +172,9 @@ import {
     useDialog,
     useMessage
 } from "naive-ui"
-import {Archive, Database, Download, KeyRound, RefreshCw, RotateCcw, ScanSearch, Trash2, Wrench} from "@lucide/vue"
+import {Archive, Database, Download, RefreshCw, RotateCcw, ScanSearch, Trash2, Wrench} from "@lucide/vue"
 
 import diaryApi, {DiaryStorageStatus} from "@/api/diaryApi"
-import migrationApi, {LegacyMigrationPreview} from "@/api/migrationApi"
 import systemConfigApi from "@/api/systemConfigApi"
 import ModernEmptyState from "@/components/ui/ModernEmptyState.vue"
 import ModernPage from "@/components/ui/ModernPage.vue"
@@ -236,11 +198,8 @@ const isExporting = ref(false)
 const isRebuilding = ref(false)
 const isLoadingTrash = ref(false)
 const isRestoring = ref(false)
-const isPreviewingMigration = ref(false)
-const isImportingMigration = ref(false)
 const storageStatus = ref<DiaryStorageStatus | null>(null)
 const trashFiles = ref<string[]>([])
-const migrationPreview = ref<LegacyMigrationPreview | null>(null)
 
 const form = reactive<AdminSystemConfig>({
     ...DEFAULT_ADMIN_SYSTEM_CONFIG
@@ -268,7 +227,7 @@ onMounted(async () => {
 async function loadConfig() {
     isLoading.value = true
     try {
-        const res = await systemConfigApi.getAdmin()
+        const res = await systemConfigApi.get()
         Object.assign(form, res.data)
         systemConfigStore.APPLY_CONFIG(res.data)
     } catch (err: any) {
@@ -411,48 +370,6 @@ async function exportFullDiary() {
     } finally {
         isExporting.value = false
     }
-}
-
-async function previewMigration() {
-    isPreviewingMigration.value = true
-    try {
-        const res = await migrationApi.preview()
-        migrationPreview.value = res.data
-        message.info(`预览完成：${res.data.cards.length} 张银行卡，${res.data.transactions.length} 条账单`)
-    } catch (err: any) {
-        message.error(err?.message || '迁移预览失败')
-    } finally {
-        isPreviewingMigration.value = false
-    }
-}
-
-function confirmImportMigration() {
-    if (!migrationPreview.value) return
-    dialog.warning({
-        title: '导入旧数据',
-        content: '导入前会自动备份。原始日记不会删除，但重复导入会产生重复记录。',
-        positiveText: '导入',
-        negativeText: '取消',
-        onPositiveClick: importMigration,
-    })
-}
-
-async function importMigration() {
-    isImportingMigration.value = true
-    try {
-        const res = await migrationApi.importLegacy()
-        message.success(`已导入 ${res.data.importedCards} 张银行卡、${res.data.importedTransactions} 条账单`)
-        migrationPreview.value = null
-        await loadStorageStatus()
-    } catch (err: any) {
-        message.error(err?.message || '导入失败')
-    } finally {
-        isImportingMigration.value = false
-    }
-}
-
-function goToChangePassword() {
-    router.push({name: 'ChangePassword'})
 }
 
 function downloadFile(fileName: string, data: string) {

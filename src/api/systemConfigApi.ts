@@ -17,9 +17,6 @@ export default {
     get(): Promise<PublicSystemConfigResponse> {
         return request('get', null, null, 'system-config') as Promise<PublicSystemConfigResponse>
     },
-    getAdmin(): Promise<AdminSystemConfigResponse> {
-        return request('get', null, null, 'system-config/admin') as Promise<AdminSystemConfigResponse>
-    },
     save(requestData: AdminSystemConfig): Promise<AdminSystemConfigResponse> {
         return request('put', null, requestData, 'system-config') as Promise<AdminSystemConfigResponse>
     }

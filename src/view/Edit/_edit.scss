@@ -1,10 +1,10 @@
 .diary-edit-container {
   min-height: 100dvh;
-  padding: 22px 18px 22px 24px;
+  padding: 24px;
   background: var(--diary-bg);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 24px;
   color: var(--diary-ink);
 }
 
@@ -15,18 +15,21 @@
 
 .writing-paper {
   min-height: calc(100dvh - 93px);
-  padding: 24px;
-  border: 1px solid var(--diary-border);
-  border-radius: var(--diary-radius);
+  display: grid;
+  grid-template-rows: minmax(154px, auto) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.editor-title,
+.editor-content {
+  border: 1px solid color-mix(in srgb, var(--diary-border) 82%, transparent);
+  border-radius: 8px;
   background: var(--diary-surface);
   box-shadow: var(--diary-hairline-shadow);
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 18px;
 }
 
 .editor-status-bar {
-  min-height: 34px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -43,7 +46,8 @@
 .editor-title,
 .editor-content {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  padding: 20px 22px;
 
   label {
     color: var(--diary-muted);
@@ -71,13 +75,12 @@
 }
 
 .editor-title {
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--diary-border);
+  grid-template-rows: auto auto auto;
 
   textarea {
-    min-height: 78px;
+    min-height: 82px;
     padding: 0;
-    font-size: clamp(24px, 3vw, 38px);
+    font-size: clamp(23px, 2.3vw, 34px);
     line-height: 1.2;
     font-weight: 750;
     letter-spacing: 0;
@@ -86,10 +89,11 @@
 
 .editor-content {
   min-height: 0;
+  padding-bottom: 18px;
 
   textarea {
     min-height: 460px;
-    padding: 4px 0 40px;
+    padding: 0 0 40px;
     font-size: 17px;
     line-height: 1.85;
     overflow-y: auto;
@@ -98,19 +102,15 @@
 
 .diary-edit-meta {
   position: sticky;
-  top: 69px;
+  top: 24px;
   align-self: start;
-  max-height: calc(100dvh - 93px);
+  max-height: calc(100dvh - 48px);
   min-height: 0;
-}
-
-.meta-panel {
-  border: 1px solid color-mix(in srgb, var(--diary-border) 62%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--diary-bg-elevated) 72%, var(--diary-surface));
-  box-shadow: none;
-  max-height: calc(100dvh - 93px);
+  display: grid;
+  align-content: start;
+  gap: 16px;
   overflow-y: auto;
+  padding-right: 2px;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -125,36 +125,6 @@
     border-radius: 999px;
     background-clip: padding-box;
     background-color: color-mix(in srgb, var(--diary-muted-2) 42%, transparent);
-  }
-}
-
-.meta-panel-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  min-height: 64px;
-  padding: 12px 14px;
-  border-bottom: 1px solid color-mix(in srgb, var(--diary-border) 68%, transparent);
-  background: color-mix(in srgb, var(--diary-surface) 92%, transparent);
-  backdrop-filter: blur(16px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-
-  span {
-    display: block;
-    color: var(--diary-ink);
-    font-size: 15px;
-    font-weight: 780;
-    line-height: 1.3;
-  }
-
-  p {
-    margin: 3px 0 0;
-    color: var(--diary-muted);
-    font-size: 12px;
-    line-height: 1.45;
   }
 }
 
@@ -179,16 +149,14 @@
   }
 }
 
-.context-block {
+.meta-card {
   display: grid;
-  gap: 9px;
-  padding: 12px 14px 14px;
-  border-bottom: 1px solid color-mix(in srgb, var(--diary-border) 72%, transparent);
-  background: color-mix(in srgb, var(--diary-surface) 84%, transparent);
-
-  &:last-child {
-    border-bottom: 0;
-  }
+  gap: 12px;
+  padding: 16px 18px 18px;
+  border: 1px solid color-mix(in srgb, var(--diary-border) 82%, transparent);
+  border-radius: 8px;
+  background: var(--diary-surface);
+  box-shadow: var(--diary-hairline-shadow);
 }
 
 .writing-attributes-section {
@@ -202,29 +170,6 @@
   }
 }
 
-.context-section-header {
-  min-height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-
-  h3 {
-    margin: 0;
-    color: var(--diary-ink);
-    font-size: 13px;
-    line-height: 1.35;
-    font-weight: 780;
-  }
-
-  p {
-    margin: 5px 0 0;
-    color: var(--diary-muted);
-    font-size: 12px;
-    line-height: 1.55;
-  }
-}
-
 .field-label {
   display: block;
   margin-bottom: 7px;
@@ -234,7 +179,12 @@
 }
 
 .date-context-section {
-  gap: 8px;
+  gap: 12px;
+}
+
+.date-card-status {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .date-selector {
@@ -243,16 +193,16 @@
 }
 
 .date-set-item {
-  min-height: 48px;
+  min-height: 64px;
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .button-date-change {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border: 0;
   border-radius: 8px;
   display: grid;
@@ -270,7 +220,7 @@
 
 .datetime {
   min-width: 0;
-  padding: 7px 8px;
+  padding: 7px 8px 8px;
   border-radius: 8px;
   display: flex;
   align-items: baseline;
@@ -285,7 +235,7 @@
   }
 
   .date {
-    font-size: 21px;
+    font-size: 30px;
     line-height: 1.1;
     font-weight: 760;
     font-variant-numeric: tabular-nums;
@@ -293,7 +243,7 @@
 
   .time {
     color: var(--diary-muted);
-    font-size: 15px;
+    font-size: 22px;
     font-weight: 650;
     font-variant-numeric: tabular-nums;
   }
@@ -302,9 +252,9 @@
 .date-meta {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 46px;
   color: var(--diary-muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .weather-summary {
@@ -312,7 +262,7 @@
   align-items: stretch;
   justify-content: space-between;
   gap: 12px;
-  min-height: 78px;
+  min-height: 82px;
   padding: 12px 13px;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--diary-accent) 18%, var(--diary-border));
@@ -376,7 +326,7 @@
 .weather-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
+  gap: 8px;
 
   > div {
     min-width: 0;
@@ -425,14 +375,8 @@
   font-size: 12px;
 }
 
-.free-source {
-  min-height: 22px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--diary-success) 12%, transparent);
-  color: var(--diary-success);
-  font-size: 12px;
-  font-weight: 700;
+.weather-form {
+  padding-top: 2px;
 }
 
 .weather-form,
@@ -461,67 +405,20 @@
   gap: 8px;
 }
 
-.settings-list {
-  display: grid;
-  gap: 8px;
-}
-
-.settings-row {
-  min-height: 48px;
-  padding: 9px 10px;
-  border: 1px solid color-mix(in srgb, var(--diary-border) 82%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--diary-surface-muted) 62%, var(--diary-surface));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-
-  span,
-  strong,
-  small {
-    min-width: 0;
-    display: block;
-  }
-
-  strong {
-    color: var(--diary-ink);
-    font-size: 13px;
-    line-height: 1.35;
-    font-weight: 720;
-  }
-
-  small {
-    margin-top: 2px;
-    color: var(--diary-muted);
-    font-size: 11px;
-    line-height: 1.35;
-  }
-}
-
 @media (max-width: 1180px) {
   .diary-edit-container {
     grid-template-columns: minmax(0, 1fr);
-    padding-right: 24px;
   }
 
   .diary-edit-meta {
     position: static;
     max-height: none;
-  }
-
-  .meta-panel {
-    max-height: none;
     overflow: visible;
+    padding-right: 0;
   }
 
   .writing-attributes-section {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-
-    .context-section-header {
-      grid-column: 1 / -1;
-    }
   }
 }
 
@@ -533,7 +430,6 @@
 
   .writing-paper {
     min-height: auto;
-    padding: 18px 15px;
     gap: 14px;
   }
 
@@ -556,20 +452,14 @@
     display: block;
   }
 
-  .meta-panel-header {
-    padding: 14px 15px 12px;
-  }
-
-  .context-block {
+  .meta-card,
+  .editor-title,
+  .editor-content {
     padding: 15px;
   }
 
   .writing-attributes-section {
     grid-template-columns: minmax(0, 1fr);
-
-    .context-section-header {
-      grid-column: auto;
-    }
   }
 
   .datetime {

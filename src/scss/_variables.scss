@@ -29,13 +29,11 @@ $bg-main        : #373737;
 $bg-menu        : #4A4A4A;
 $bg-searchbar   : #E5E5EA;
 $bg-share       : #FFFDF8;
-$bg-bill-brief  : #fdfdfd;
 $bg-setup       : #121212;
 $bg-setup-card  : color.adjust(black, $lightness: 18%);
 
 // Border
 $color-border           : #ddd;
-$color-border-bill      : #d7d7d7;
 $color-border-light     : color.adjust($color-border, $lightness: 5%);
 $color-border-highlight : color.adjust($color-border, $lightness: -15%);
 $color-border-share     : #F0E8DB;
@@ -134,7 +132,6 @@ $dark-border-setup     : #3b3b3b;
 $dark-bg-td            : color.adjust($dark-color, $lightness: 23%);
 $dark-bg-td-even       : color.adjust($dark-color, $lightness: 20%);
 $dark-bg-td-active     : color.adjust($dark-color, $lightness: 30%);
-$dark-bg-bill-brief    : color.adjust($dark-color, $lightness: 18%);
 $dark-bg-main          : color.adjust($dark-color, $lightness: 20%);
 $dark-bg-menu          : color.adjust($dark-color, $lightness: 18%);
 $dark-bg-setup-card    : color.adjust($bg-setup-card, $lightness: -4%);
@@ -155,8 +152,6 @@ $dark-text-subtitle    : color.adjust($dark-color, $lightness: 60%) ;
 
 $dark-text-header-date: color.adjust($dark-color, $lightness: 80%) ;
 $dark-text-header-lunar: color.adjust($dark-color, $lightness: 60%) ;
-
-$dark-text-bill-price  : color.adjust($dark-color, $lightness: 80%) ;
 
 $dark-scroll-thumb     : color.adjust($dark-color, $lightness: 30%) ;
 

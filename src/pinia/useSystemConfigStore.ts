@@ -3,21 +3,10 @@ import {defineStore} from "pinia"
 import systemConfigApi from "@/api/systemConfigApi"
 import {DEFAULT_SYSTEM_CONFIG, PublicSystemConfig} from "@/entity/SystemConfig"
 
-function parseBoolean(value: unknown) {
-    return value === true || value === 1 || value === '1' || value === 'true'
-}
-
 function normalizeSystemConfig(rawConfig: Partial<PublicSystemConfig> = {}): PublicSystemConfig {
     return {
-        is_show_demo_account: parseBoolean(rawConfig.is_show_demo_account),
-        demo_account: String(rawConfig.demo_account || '').trim(),
-        demo_account_password: String(rawConfig.demo_account_password || ''),
-        qiniu_img_base_url: String(rawConfig.qiniu_img_base_url || '').trim(),
-        qiniu_bucket_name: String(rawConfig.qiniu_bucket_name || '').trim(),
-        qiniu_style_suffix: String(rawConfig.qiniu_style_suffix || '').trim(),
         hefeng_weather_api_key: String(rawConfig.hefeng_weather_api_key || '').trim(),
-        hefeng_weather_api_host: String(rawConfig.hefeng_weather_api_host || '').trim(),
-        register_tip: String(rawConfig.register_tip || '').trim()
+        hefeng_weather_api_host: String(rawConfig.hefeng_weather_api_host || '').trim()
     }
 }
 

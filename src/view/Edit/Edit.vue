@@ -2,17 +2,16 @@
     <div class="diary-edit-container" :style="`min-height: ${projectStore.insets.heightPanel}px`">
         <main class="diary-edit-content" aria-label="日记编辑器">
             <div class="writing-paper">
-                <EditorStatusBar
-                    :word-count="editorWordCount"
-                    :line-count="editorLineCount"
-                    :has-changed="diaryHasChanged"
-                    :has-local-draft="hasLocalDraft"
-                    :draft-saved-at-label="draftSavedAtLabel"
-                    :last-saved-at-label="lastSavedAtLabel"
-                    @restore-draft="restoreLocalDraft"
-                />
-
                 <div class="editor-title">
+                    <EditorStatusBar
+                        :word-count="editorWordCount"
+                        :line-count="editorLineCount"
+                        :has-changed="diaryHasChanged"
+                        :has-local-draft="hasLocalDraft"
+                        :draft-saved-at-label="draftSavedAtLabel"
+                        :last-saved-at-label="lastSavedAtLabel"
+                        @restore-draft="restoreLocalDraft"
+                    />
                     <label for="diary-title">标题</label>
                     <textarea
                         id="diary-title"
@@ -39,83 +38,47 @@
         </main>
 
         <aside class="diary-edit-meta" aria-label="日记上下文">
-            <div class="meta-panel">
-                <header class="meta-panel-header">
-                    <div>
-                        <span>写作检查器</span>
-                        <p>整理这篇日记的时间、状态和环境</p>
-                    </div>
+            <section class="meta-card date-context-section">
+                <div class="date-card-status">
                     <span class="meta-status-pill" :class="{changed: diaryHasChanged}">
                         {{ diaryHasChanged ? '未保存' : '已同步' }}
                     </span>
-                </header>
+                </div>
+                <EditorVCalendarSelector
+                    @dayChange="dayHasChanged"
+                    v-model="diary.date"/>
+            </section>
 
-                <section class="context-block date-context-section">
-                    <div class="context-section-header">
-                        <h3>时间</h3>
-                    </div>
-                    <EditorVCalendarSelector
-                        @dayChange="dayHasChanged"
-                        v-model="diary.date"/>
-                </section>
-
-                <section class="context-block writing-attributes-section">
-                    <div class="context-section-header">
-                        <h3>写作属性</h3>
-                    </div>
-                    <EditCategorySelector :category="diary.category" @change="setCategory"/>
-                    <MoodTagPicker
-                        v-model:mood="diary.mood"
-                        v-model:tags="diary.tags"
-                    />
-                </section>
-
-                <WeatherLocationCard
-                    :loading="isResolvingContext"
-                    :weather="diary.weather"
-                    :weather-text="diary.weatherText || ''"
-                    :temperature-inside="String(diary.temperature || '')"
-                    :temperature-outside="String(diary.temperature_outside || '')"
-                    :location-name="diary.locationName || ''"
-                    :humidity="diary.humidity || ''"
-                    :wind-text="diary.windText || ''"
-                    :context-updated-at="diary.contextUpdatedAt || ''"
-                    @update:temperature-inside="value => diary.temperature = value"
-                    @update:temperature-outside="value => diary.temperature_outside = value"
-                    @resolve-location="resolveContextFromBrowser"
-                    @resolve-city="resolveContextFromCity"
-                    @clear="clearDiaryContext"
+            <section class="meta-card writing-attributes-section">
+                <EditCategorySelector :category="diary.category" @change="setCategory"/>
+                <MoodTagPicker
+                    v-model:mood="diary.mood"
+                    v-model:tags="diary.tags"
                 />
+            </section>
 
-                <section class="context-block settings-context-section">
-                    <div class="context-section-header">
-                        <h3>写作设置</h3>
-                    </div>
-                    <div class="settings-list">
-                        <label class="settings-row">
-                            <span>
-                                <strong>公开分享</strong>
-                                <small>生成可公开访问的阅读页</small>
-                            </span>
-                            <NSwitch v-model:value="diary.is_public"/>
-                        </label>
-                        <label class="settings-row">
-                            <span>
-                                <strong>Markdown</strong>
-                                <small>按 Markdown 语法保存正文</small>
-                            </span>
-                            <NSwitch v-model:value="diary.is_markdown"/>
-                        </label>
-                    </div>
-                </section>
-            </div>
+            <WeatherLocationCard
+                :loading="isResolvingContext"
+                :weather="diary.weather"
+                :weather-text="diary.weatherText || ''"
+                :temperature-inside="String(diary.temperature || '')"
+                :temperature-outside="String(diary.temperature_outside || '')"
+                :location-name="diary.locationName || ''"
+                :humidity="diary.humidity || ''"
+                :wind-text="diary.windText || ''"
+                :context-updated-at="diary.contextUpdatedAt || ''"
+                @update:temperature-inside="value => diary.temperature = value"
+                @update:temperature-outside="value => diary.temperature_outside = value"
+                @resolve-location="resolveContextFromBrowser"
+                @resolve-city="resolveContextFromCity"
+                @clear="clearDiaryContext"
+            />
         </aside>
     </div>
 </template>
 
 <script lang="ts" setup>
 import Moment from 'moment'
-import {NSwitch} from "naive-ui"
 
 // components
 import EditCategorySelector from "./CategorySelector/EditorCategorySelector.vue"

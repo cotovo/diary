@@ -1,10 +1,5 @@
-// LOGO
-import logo_register from "./logo/logo_register.svg?url"
-import logo_change_password from "./logo/logo_change_password.svg?url"
 import logo_avatar from "./logo/logo_avatar.svg?url"
 import logo_server_error from "./logo/logo_server_error.svg?url"
-import logo_init from "./logo/logo_init.svg?url"
-import logo_config from "./logo/logo_config.svg?url"
 import homepage_logo from "./logo/homepage_logo.png?url"
 
 // Weather
@@ -60,12 +55,8 @@ export default {
         logo_title_saved: homepage_logo,
         logo_rounded: homepage_logo,
         logo_diary_book: homepage_logo,
-        logo_register,
-        logo_change_password,
         logo_avatar,
         logo_server_error,
-        logo_init,
-        logo_config,
     },
     EOF,
     EOFDark: EOF_dark,

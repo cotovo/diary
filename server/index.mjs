@@ -15,20 +15,14 @@ const dataDir = path.resolve(process.env.DIARY_DATA_DIR || path.join(rootDir, "d
 const entriesDir = path.join(dataDir, "entries");
 const backupsDir = path.join(dataDir, "backups");
 const trashDir = path.join(dataDir, "trash");
-const vaultDir = path.join(dataDir, "vault");
-const financeDir = path.join(dataDir, "finance");
 const indexPath = path.join(dataDir, "index.json");
 const configPath = path.join(dataDir, "config.json");
-const vaultCardsPath = path.join(vaultDir, "cards.json");
-const financeTransactionsPath = path.join(financeDir, "transactions.json");
-const financeCategoriesPath = path.join(financeDir, "categories.json");
 const distDir = path.join(rootDir, "dist");
 
 const port = Number(process.env.PORT || 3000);
 const sessionSecret = process.env.SESSION_SECRET || "local-diary-session-secret-change-me";
 const adminEmail = process.env.ADMIN_EMAIL || "me@diary.local";
 const defaultDevPassword = "diary";
-const vaultSecret = process.env.VAULT_SECRET || `${sessionSecret}:local-vault-secret`;
 
 const categories = [
   { name: "日常", name_en: "life", color: "#007AFF" },
@@ -43,13 +37,7 @@ const legacyCategoryMap = new Map([
   ["memo", "idea"],
   ["code", "study"],
   ["week", "work"],
-  ["bill", "life"],
 ]);
-
-const defaultFinanceCategories = {
-  expense: ["餐饮", "交通", "购物", "居住", "娱乐", "医疗", "学习", "旅行", "其他"],
-  income: ["工资", "奖金", "理财", "报销", "其他"],
-};
 
 const defaultProfile = {
   uid: 1,
@@ -82,15 +70,8 @@ function loadEnvFile(filePath) {
 }
 
 const defaultSystemConfig = {
-  is_show_demo_account: false,
-  demo_account: adminEmail,
-  demo_account_password: "",
-  qiniu_img_base_url: "",
-  qiniu_bucket_name: "",
-  qiniu_style_suffix: "",
   hefeng_weather_api_key: "",
   hefeng_weather_api_host: "",
-  register_tip: "这是一个单人使用的私人日记系统。",
 };
 
 function ok(res, data = null, message = "OK", extraHeaders = {}) {
@@ -118,20 +99,9 @@ async function ensureData() {
   await fs.mkdir(entriesDir, { recursive: true });
   await fs.mkdir(backupsDir, { recursive: true });
   await fs.mkdir(trashDir, { recursive: true });
-  await fs.mkdir(vaultDir, { recursive: true });
-  await fs.mkdir(financeDir, { recursive: true });
 
   if (!fsSync.existsSync(indexPath)) {
     await writeJson(indexPath, { nextId: 1, entries: [] });
-  }
-  if (!fsSync.existsSync(vaultCardsPath)) {
-    await writeJson(vaultCardsPath, { nextId: 1, cards: [] });
-  }
-  if (!fsSync.existsSync(financeTransactionsPath)) {
-    await writeJson(financeTransactionsPath, { nextId: 1, transactions: [] });
-  }
-  if (!fsSync.existsSync(financeCategoriesPath)) {
-    await writeJson(financeCategoriesPath, defaultFinanceCategories);
   }
   if (!fsSync.existsSync(configPath)) {
     await writeJson(configPath, {
@@ -145,7 +115,6 @@ async function ensureData() {
         config_json: {},
         date_modify: null,
       },
-      billKeys: [],
       passwordHash: process.env.ADMIN_PASSWORD_HASH || hashPasswordScrypt(defaultDevPassword),
       passwordUpdatedAt: new Date().toISOString(),
     });
@@ -163,146 +132,6 @@ async function readJson(filePath, fallback) {
 async function writeJson(filePath, value) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-}
-
-function deriveVaultKey() {
-  return crypto.createHash("sha256").update(String(vaultSecret)).digest();
-}
-
-function encryptSecret(value) {
-  const text = String(value || "").trim();
-  if (!text) return null;
-  const iv = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv("aes-256-gcm", deriveVaultKey(), iv);
-  const encrypted = Buffer.concat([cipher.update(text, "utf8"), cipher.final()]);
-  return {
-    v: 1,
-    iv: iv.toString("base64"),
-    tag: cipher.getAuthTag().toString("base64"),
-    data: encrypted.toString("base64"),
-  };
-}
-
-function decryptSecret(payload) {
-  if (!payload?.iv || !payload?.tag || !payload?.data) return "";
-  const decipher = crypto.createDecipheriv("aes-256-gcm", deriveVaultKey(), Buffer.from(payload.iv, "base64"));
-  decipher.setAuthTag(Buffer.from(payload.tag, "base64"));
-  return Buffer.concat([decipher.update(Buffer.from(payload.data, "base64")), decipher.final()]).toString("utf8");
-}
-
-function onlyDigits(value) {
-  return String(value || "").replace(/\D/g, "");
-}
-
-function maskCardNo(cardNo, fallbackLast4 = "") {
-  const digits = onlyDigits(cardNo);
-  const last4 = digits.slice(-4) || String(fallbackLast4 || "").slice(-4);
-  return last4 ? `**** **** **** ${last4}` : "未填写";
-}
-
-async function readVaultCards() {
-  const raw = await readJson(vaultCardsPath, { nextId: 1, cards: [] });
-  const cards = Array.isArray(raw.cards) ? raw.cards : [];
-  return {
-    nextId: Number(raw.nextId) || cards.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1,
-    cards,
-  };
-}
-
-async function writeVaultCards(value) {
-  const nextId = Math.max(
-    Number(value.nextId) || 1,
-    value.cards.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1,
-  );
-  await writeJson(vaultCardsPath, { nextId, cards: value.cards });
-}
-
-function cardToPublic(card, { reveal = false } = {}) {
-  const fullCardNo = reveal ? decryptSecret(card.cardNoCipher) : "";
-  return {
-    id: Number(card.id),
-    bankName: card.bankName || card.cardName || "",
-    cardType: card.cardType || "储蓄卡",
-    cardNo: reveal ? fullCardNo : "",
-    cardNoMasked: maskCardNo(fullCardNo, card.cardNoLast4),
-    cardNoLast4: card.cardNoLast4 || "",
-    branch: card.branch || "",
-    statementDay: card.statementDay || "",
-    repaymentDay: card.repaymentDay || "",
-    creditLimit: Number(card.creditLimit || 0),
-    note: card.note || "",
-    color: card.color || "#007AFF",
-    createdAt: card.createdAt || "",
-    updatedAt: card.updatedAt || "",
-    migratedFrom: card.migratedFrom || "",
-  };
-}
-
-function normalizeCardInput(body = {}, existing = {}) {
-  const now = new Date().toISOString();
-  const cardNo = String(body.cardNo ?? "").trim();
-  const encrypted = cardNo ? encryptSecret(cardNo) : existing.cardNoCipher;
-  const digits = onlyDigits(cardNo);
-  return {
-    ...existing,
-    bankName: String(body.bankName ?? body.cardName ?? existing.bankName ?? "").trim(),
-    cardType: String(body.cardType ?? existing.cardType ?? "储蓄卡").trim(),
-    cardNoCipher: encrypted || null,
-    cardNoLast4: digits ? digits.slice(-4) : existing.cardNoLast4 || "",
-    branch: String(body.branch ?? body["开户行"] ?? existing.branch ?? "").trim(),
-    statementDay: body.statementDay ?? existing.statementDay ?? "",
-    repaymentDay: body.repaymentDay ?? existing.repaymentDay ?? "",
-    creditLimit: Number(body.creditLimit ?? existing.creditLimit ?? 0) || 0,
-    note: String(body.note ?? existing.note ?? "").trim(),
-    color: String(body.color ?? existing.color ?? "#007AFF").trim() || "#007AFF",
-    createdAt: existing.createdAt || now,
-    updatedAt: now,
-    migratedFrom: body.migratedFrom ?? existing.migratedFrom ?? "",
-  };
-}
-
-async function readFinanceTransactions() {
-  const raw = await readJson(financeTransactionsPath, { nextId: 1, transactions: [] });
-  const transactions = Array.isArray(raw.transactions) ? raw.transactions : [];
-  return {
-    nextId: Number(raw.nextId) || transactions.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1,
-    transactions,
-  };
-}
-
-async function writeFinanceTransactions(value) {
-  const nextId = Math.max(
-    Number(value.nextId) || 1,
-    value.transactions.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1,
-  );
-  await writeJson(financeTransactionsPath, { nextId, transactions: value.transactions });
-}
-
-async function readFinanceCategories() {
-  const raw = await readJson(financeCategoriesPath, defaultFinanceCategories);
-  return {
-    expense: Array.isArray(raw.expense) ? raw.expense : defaultFinanceCategories.expense,
-    income: Array.isArray(raw.income) ? raw.income : defaultFinanceCategories.income,
-  };
-}
-
-function normalizeTransactionInput(body = {}, existing = {}) {
-  const now = new Date().toISOString();
-  const type = body.type === "income" ? "income" : "expense";
-  return {
-    ...existing,
-    date: toDateString(body.date ?? existing.date ?? new Date()),
-    type,
-    amount: Math.abs(Number(body.amount ?? existing.amount ?? 0)) || 0,
-    category: String(body.category ?? existing.category ?? "其他").trim() || "其他",
-    accountId: body.accountId === "" || body.accountId === undefined ? "" : Number(body.accountId),
-    accountName: String(body.accountName ?? existing.accountName ?? "").trim(),
-    merchant: String(body.merchant ?? body.item ?? existing.merchant ?? "").trim(),
-    note: String(body.note ?? existing.note ?? "").trim(),
-    createdAt: existing.createdAt || now,
-    updatedAt: now,
-    migratedFrom: body.migratedFrom ?? existing.migratedFrom ?? "",
-  };
 }
 
 async function readIndex() {
@@ -341,7 +170,6 @@ async function readConfig() {
       date_modify: null,
       ...config.userConfig,
     },
-    billKeys: Array.isArray(config.billKeys) ? config.billKeys : [],
     passwordHash: config.passwordHash || process.env.ADMIN_PASSWORD_HASH || hashPasswordScrypt(defaultDevPassword),
     passwordUpdatedAt: config.passwordUpdatedAt || new Date().toISOString(),
   };
@@ -389,10 +217,8 @@ async function isAuthorized(req) {
 
 function publicRoute(route) {
   return [
-    "setup/status",
     "system-config",
     "user/login",
-    "user/avatar",
     "diary-category/list",
   ].includes(route) || route === "diary/share";
 }
@@ -591,9 +417,6 @@ async function backupCurrentData(reason) {
   const backupPath = path.join(backupsDir, `${stamp}-${reason}.json`);
   const index = await readIndex();
   const config = await readConfig();
-  const vault = await readJson(vaultCardsPath, { nextId: 1, cards: [] });
-  const financeTransactions = await readJson(financeTransactionsPath, { nextId: 1, transactions: [] });
-  const financeCategories = await readJson(financeCategoriesPath, defaultFinanceCategories);
   const entries = await Promise.all(
     index.entries.map(async (entry) => {
       try {
@@ -619,11 +442,6 @@ async function backupCurrentData(reason) {
     createdAt: new Date().toISOString(),
     index,
     config,
-    vault,
-    finance: {
-      transactions: financeTransactions,
-      categories: financeCategories,
-    },
     entries,
   });
   return backupPath;
@@ -732,11 +550,7 @@ async function getStorageStatus() {
     entriesDir,
     backupsDir,
     trashDir,
-    vaultDir,
-    financeDir,
     indexPath,
-    vaultCardsPath,
-    financeTransactionsPath,
     diaryCount: index.entries.length,
     markdownFileCount: markdownCount,
     backupCount: backupFiles.length,
@@ -796,136 +610,11 @@ async function rebuildIndexFromFiles({ dryRun = false } = {}) {
 async function buildFullExport(params) {
   const list = await filterEntries(params);
   const status = await getStorageStatus();
-  const vault = await readVaultCards();
-  const finance = await readFinanceTransactions();
-  const financeCategories = await readFinanceCategories();
   return {
     exportedAt: new Date().toISOString(),
     version: 2,
     storage: status,
     entries: list,
-    vault: {
-      cards: vault.cards.map((card) => cardToPublic(card)),
-    },
-    finance: {
-      transactions: finance.transactions,
-      categories: financeCategories,
-      summary: summarizeFinance(finance.transactions),
-    },
-  };
-}
-
-function summarizeFinance(transactions) {
-  const monthMap = new Map();
-  let income = 0;
-  let expense = 0;
-  for (const item of transactions) {
-    const amount = Number(item.amount || 0);
-    if (item.type === "income") income += amount;
-    else expense += amount;
-    const date = new Date(item.date);
-    const month = Number.isNaN(date.getTime())
-      ? "未知"
-      : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    if (!monthMap.has(month)) {
-      monthMap.set(month, { month, income: 0, expense: 0, count: 0 });
-    }
-    const bucket = monthMap.get(month);
-    bucket.count += 1;
-    if (item.type === "income") bucket.income += amount;
-    else bucket.expense += amount;
-  }
-  return {
-    income,
-    expense,
-    balance: income - expense,
-    count: transactions.length,
-    months: [...monthMap.values()].sort((a, b) => String(b.month).localeCompare(String(a.month))),
-  };
-}
-
-function parseLegacyCardText(content = "") {
-  return String(content || "")
-    .split(/\n\s*\n/g)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => {
-      const result = {};
-      for (const line of block.split(/\r?\n/)) {
-        const index = line.indexOf("：") > -1 ? line.indexOf("：") : line.indexOf(":");
-        if (index === -1) continue;
-        const key = line.slice(0, index).trim();
-        const value = line.slice(index + 1).trim();
-        if (!key || !value) continue;
-        if (key === "银行") result.bankName = value;
-        else if (key === "卡号") result.cardNo = value;
-        else if (key === "类别") result.cardType = value;
-        else if (key === "开户行") result.branch = value;
-        else if (key === "额度") result.creditLimit = Number(value) || 0;
-        else result.note = [result.note, `${key}: ${value}`].filter(Boolean).join("\n");
-      }
-      return result.bankName || result.cardNo ? result : null;
-    })
-    .filter(Boolean);
-}
-
-function parseLegacyBillContent(content = "", date = new Date()) {
-  return String(content || "")
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const match = line.match(/^(.+?)\s+(-?\d+(?:\.\d{1,2})?)$/);
-      if (!match) return null;
-      const amount = Number(match[2]);
-      if (!Number.isFinite(amount) || amount === 0) return null;
-      return normalizeTransactionInput({
-        date,
-        type: amount > 0 ? "income" : "expense",
-        amount: Math.abs(amount),
-        merchant: match[1],
-        category: "其他",
-        migratedFrom: "legacy-bill-diary",
-      });
-    })
-    .filter(Boolean);
-}
-
-async function buildMigrationPreview() {
-  const params = new URLSearchParams({ keywords: JSON.stringify([]), categories: JSON.stringify([]) });
-  const list = await filterEntries(params);
-  const cardDiary = list.find((entry) => entry.title === "我的银行卡列表");
-  const cards = cardDiary ? parseLegacyCardText(cardDiary.content) : [];
-  const billEntries = list.filter((entry) => entry.category === "bill" || entry.mood === "bill");
-  const transactions = billEntries.flatMap((entry) => parseLegacyBillContent(entry.content, entry.date));
-  return {
-    cards: cards.map((card, index) => ({ ...card, id: index + 1, cardNoMasked: maskCardNo(card.cardNo) })),
-    transactions,
-    sources: {
-      cardDiaryId: cardDiary?.id || null,
-      billDiaryIds: billEntries.map((entry) => entry.id),
-    },
-  };
-}
-
-async function importLegacyData() {
-  const preview = await buildMigrationPreview();
-  await backupCurrentData("before-migration");
-  const vault = await readVaultCards();
-  const finance = await readFinanceTransactions();
-  for (const card of preview.cards) {
-    const id = vault.nextId++;
-    vault.cards.push({ id, ...normalizeCardInput({ ...card, migratedFrom: "legacy-card-diary" }) });
-  }
-  for (const transaction of preview.transactions) {
-    const id = finance.nextId++;
-    finance.transactions.push({ id, ...normalizeTransactionInput(transaction) });
-  }
-  await writeVaultCards(vault);
-  await writeFinanceTransactions(finance);
-  return {
-    importedCards: preview.cards.length,
-    importedTransactions: preview.transactions.length,
   };
 }
 
@@ -1125,15 +814,6 @@ function hashPasswordScrypt(password) {
   return `scrypt$16384$8$1$${salt}$${key}`;
 }
 
-async function hashPassword(password) {
-  try {
-    const argon2 = await import("argon2");
-    return argon2.hash(String(password), { type: argon2.argon2id });
-  } catch {
-    return hashPasswordScrypt(password);
-  }
-}
-
 async function verifyPassword(password, hash) {
   if (String(hash).startsWith("$argon2")) {
     try {
@@ -1157,26 +837,9 @@ async function handleApi(req, res, route, params) {
   if (!(await requireAuth(req, res, route))) return;
   const body = await parseRequestBody(req).catch(() => null);
 
-  if (route === "setup/status" && req.method === "GET") {
-    ok(res, {
-      isInitialized: true,
-      hasRegisteredUsers: true,
-      lockFileName: "single-user-file-storage",
-      configFiles: [configPath, indexPath],
-      restartTips: [],
-      config: null,
-    });
-    return;
-  }
-
   if (route === "system-config" && req.method === "GET") {
     const config = await readConfig();
     ok(res, config.systemConfig);
-    return;
-  }
-  if (route === "system-config/admin" && req.method === "GET") {
-    const config = await readConfig();
-    ok(res, { ...config.systemConfig, invitation_code: "", qiniu_access_key: "", qiniu_secret_key: "" });
     return;
   }
   if (route === "system-config" && req.method === "PUT") {
@@ -1214,31 +877,6 @@ async function handleApi(req, res, route, params) {
     ok(res, null, "已退出", {
       "Set-Cookie": "DiarySession=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0",
     });
-    return;
-  }
-  if (route === "user/avatar" && req.method === "GET") {
-    const config = await readConfig();
-    ok(res, { avatar: config.profile.avatar || "" });
-    return;
-  }
-  if (route === "user/change-password" && req.method === "PUT") {
-    const password = String(body?.password || "");
-    if (password.length < 1) {
-      fail(res, "密码不能为空");
-      return;
-    }
-    await writeConfigPatch({
-      passwordHash: await hashPassword(password),
-      passwordUpdatedAt: new Date().toISOString(),
-    });
-    ok(res, null, "密码已修改");
-    return;
-  }
-  if (route === "user/set-profile" && req.method === "PUT") {
-    const config = await readConfig();
-    const profile = { ...config.profile, ...(body || {}), uid: 1, email: config.profile.email };
-    await writeConfigPatch({ profile });
-    ok(res, profile, "个人资料已保存");
     return;
   }
 
@@ -1296,135 +934,6 @@ async function handleApi(req, res, route, params) {
   }
   if (route === "diary/export-full" && req.method === "GET") {
     ok(res, await buildFullExport(params));
-    return;
-  }
-
-  if (route === "vault/cards" && req.method === "GET") {
-    const vault = await readVaultCards();
-    const reveal = params.get("reveal") === "1";
-    ok(res, vault.cards.map((card) => cardToPublic(card, { reveal })));
-    return;
-  }
-  if (route === "vault/cards" && req.method === "POST") {
-    const vault = await readVaultCards();
-    const id = vault.nextId;
-    const card = { id, ...normalizeCardInput(body || {}) };
-    vault.cards.push(card);
-    vault.nextId = id + 1;
-    await writeVaultCards(vault);
-    ok(res, cardToPublic(card), "银行卡已保存");
-    return;
-  }
-  if (route === "vault/cards" && req.method === "PATCH") {
-    const id = Number(body?.id || params.get("id"));
-    const vault = await readVaultCards();
-    const idx = vault.cards.findIndex((card) => Number(card.id) === id);
-    if (idx === -1) {
-      fail(res, "银行卡不存在", 404);
-      return;
-    }
-    vault.cards[idx] = { ...vault.cards[idx], ...normalizeCardInput(body || {}, vault.cards[idx]), id };
-    await writeVaultCards(vault);
-    ok(res, cardToPublic(vault.cards[idx]), "银行卡已保存");
-    return;
-  }
-  if (route === "vault/cards" && req.method === "DELETE") {
-    const id = Number(body?.id || params.get("id"));
-    const vault = await readVaultCards();
-    const before = vault.cards.length;
-    vault.cards = vault.cards.filter((card) => Number(card.id) !== id);
-    if (vault.cards.length === before) {
-      fail(res, "银行卡不存在", 404);
-      return;
-    }
-    await writeVaultCards(vault);
-    ok(res, null, "银行卡已删除");
-    return;
-  }
-
-  if (route === "finance/categories" && req.method === "GET") {
-    ok(res, await readFinanceCategories());
-    return;
-  }
-  if (route === "finance/categories" && req.method === "PATCH") {
-    const categoriesNext = {
-      ...await readFinanceCategories(),
-      ...(body || {}),
-    };
-    await writeJson(financeCategoriesPath, categoriesNext);
-    ok(res, categoriesNext, "账单分类已保存");
-    return;
-  }
-  if (route === "finance/transactions" && req.method === "GET") {
-    const finance = await readFinanceTransactions();
-    const type = params.get("type");
-    const keyword = String(params.get("keyword") || "").toLowerCase();
-    const from = params.get("from");
-    const to = params.get("to");
-    const fromTime = from ? new Date(String(from).replace(" ", "T")).getTime() : null;
-    const toTime = to ? new Date(String(to).replace(" ", "T")).getTime() : null;
-    const rows = finance.transactions
-      .filter((item) => !type || item.type === type)
-      .filter((item) => {
-        if (!keyword) return true;
-        return `${item.category} ${item.merchant} ${item.note} ${item.accountName}`.toLowerCase().includes(keyword);
-      })
-      .filter((item) => {
-        const time = new Date(item.date).getTime();
-        return (!fromTime || time >= fromTime) && (!toTime || time <= toTime);
-      })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || Number(b.id) - Number(a.id));
-    ok(res, rows);
-    return;
-  }
-  if (route === "finance/transactions" && req.method === "POST") {
-    const finance = await readFinanceTransactions();
-    const id = finance.nextId;
-    const transaction = { id, ...normalizeTransactionInput(body || {}) };
-    finance.transactions.push(transaction);
-    finance.nextId = id + 1;
-    await writeFinanceTransactions(finance);
-    ok(res, transaction, "账单已保存");
-    return;
-  }
-  if (route === "finance/transactions" && req.method === "PATCH") {
-    const id = Number(body?.id || params.get("id"));
-    const finance = await readFinanceTransactions();
-    const idx = finance.transactions.findIndex((item) => Number(item.id) === id);
-    if (idx === -1) {
-      fail(res, "账单不存在", 404);
-      return;
-    }
-    finance.transactions[idx] = { ...finance.transactions[idx], ...normalizeTransactionInput(body || {}, finance.transactions[idx]), id };
-    await writeFinanceTransactions(finance);
-    ok(res, finance.transactions[idx], "账单已保存");
-    return;
-  }
-  if (route === "finance/transactions" && req.method === "DELETE") {
-    const id = Number(body?.id || params.get("id"));
-    const finance = await readFinanceTransactions();
-    const before = finance.transactions.length;
-    finance.transactions = finance.transactions.filter((item) => Number(item.id) !== id);
-    if (finance.transactions.length === before) {
-      fail(res, "账单不存在", 404);
-      return;
-    }
-    await writeFinanceTransactions(finance);
-    ok(res, null, "账单已删除");
-    return;
-  }
-  if (route === "finance/summary" && req.method === "GET") {
-    const finance = await readFinanceTransactions();
-    ok(res, summarizeFinance(finance.transactions));
-    return;
-  }
-
-  if (route === "migration/legacy/preview" && req.method === "GET") {
-    ok(res, await buildMigrationPreview(), "迁移预览已生成");
-    return;
-  }
-  if (route === "migration/legacy/import" && req.method === "POST") {
-    ok(res, await importLegacyData(), "旧数据已导入结构化模块");
     return;
   }
 
@@ -1545,11 +1054,6 @@ async function handleApi(req, res, route, params) {
     );
     return;
   }
-  if (route === "statistic/users" && req.method === "GET") {
-    const config = await readConfig();
-    ok(res, [config.profile]);
-    return;
-  }
   if (route === "statistic/weather" && req.method === "GET") {
     const list = await filterEntries(new URLSearchParams());
     ok(
@@ -1563,37 +1067,6 @@ async function handleApi(req, res, route, params) {
         }))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
     );
-    return;
-  }
-
-  if (route === "bill/keys" && req.method === "GET") {
-    const config = await readConfig();
-    ok(res, config.billKeys);
-    return;
-  }
-  if (route.startsWith("bill/") && req.method === "GET") {
-    ok(res, route.endsWith("borrow") ? "" : []);
-    return;
-  }
-  if (route === "bank-card" && req.method === "GET") {
-    const vault = await readVaultCards();
-    ok(res, vault.cards.map((card) => cardToPublic(card)));
-    return;
-  }
-  if (route === "file-manager/list" && req.method === "GET") {
-    ok(res, []);
-    return;
-  }
-  if (route.startsWith("file-manager/")) {
-    ok(res, null, "文件管理在单人文件版中暂未启用");
-    return;
-  }
-  if (route === "image-qiniu" || route === "image-qiniu/") {
-    ok(res, "");
-    return;
-  }
-  if (route.startsWith("invitation/")) {
-    ok(res, [], "单人版本不需要邀请码");
     return;
   }
 
@@ -1643,21 +1116,12 @@ function isApiPath(pathname) {
   const firstSegment = pathname.split("/").filter(Boolean)[0];
   return [
     "auth",
-    "bank-card",
-    "bill",
     "diary",
     "diary-category",
-    "finance",
-    "file-manager",
-    "image-qiniu",
-    "invitation",
-    "migration",
-    "setup",
     "statistic",
     "system-config",
     "user",
     "user-config",
-    "vault",
   ].includes(firstSegment);
 }
 

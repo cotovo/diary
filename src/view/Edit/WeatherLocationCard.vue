@@ -1,10 +1,5 @@
 <template>
-    <section class="context-block weather-context-section">
-        <div class="context-section-header">
-            <h3>天气与位置</h3>
-            <span class="free-source">免费天气</span>
-        </div>
-
+    <section class="meta-card weather-context-section">
         <div class="weather-summary">
             <div class="weather-summary-main">
                 <span class="weather-kicker">{{ weatherLabel }}</span>

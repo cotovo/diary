@@ -15,11 +15,7 @@ export interface DiaryStorageStatus {
     entriesDir: string
     backupsDir: string
     trashDir: string
-    vaultDir: string
-    financeDir: string
     indexPath: string
-    vaultCardsPath: string
-    financeTransactionsPath: string
     diaryCount: number
     markdownFileCount: number
     backupCount: number
@@ -34,14 +30,6 @@ export interface DiaryFullExport {
     version: number
     storage: DiaryStorageStatus
     entries: Array<EntityDiaryFromServer>
-    vault?: {
-        cards: Array<any>
-    }
-    finance?: {
-        transactions: Array<any>
-        categories: any
-        summary: any
-    }
 }
 
 export interface DiaryContextPayload {

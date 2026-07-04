@@ -75,7 +75,7 @@
 
         <RouterLink class="back-link" to="/">
             <img :src="SVG_ICONS.logo_icons.logo" alt="logo">
-            标题日记
+            日记
         </RouterLink>
 
     </div>

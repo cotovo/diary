@@ -54,9 +54,9 @@ export default defineConfig({
             },
 
             // MANIFEST PWA https://vite-pwa-org.netlify.app/guide/pwa-minimal-requirements.html
-            includeAssets: ['logo.png', 'favicon.ico'],
+            includeAssets: ['logo.png', 'favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png'],
             manifest: {
-                name: '标题日记',
+                name: '日记',
                 short_name: "日记",
                 theme_color: "#F5F5F7",
                 start_url: "./",
@@ -64,13 +64,13 @@ export default defineConfig({
                 background_color: "#F5F5F7",
                 icons: [
                     {
-                        src: "logo.png",
-                        sizes: "512x512",
+                        src: "android-chrome-192x192.png",
+                        sizes: "192x192",
                         type: "image/png",
                         purpose: "any",
                     },
                     {
-                        src: "logo.png",
+                        src: "android-chrome-512x512.png",
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any",

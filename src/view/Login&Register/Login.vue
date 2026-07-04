@@ -13,9 +13,8 @@
                     </div>
 
                     <div class="ios-login-heading">
-                        <p>Private diary</p>
-                        <h1 id="login-title">回到你的日记</h1>
-                        <span>输入管理员密码后继续写作。</span>
+                        <h1 id="login-title">日记</h1>
+                        <span>输入密码后继续写。</span>
                     </div>
 
                     <NForm class="ios-login-form" :show-feedback="false" @submit.prevent="loginSubmit">
@@ -26,7 +25,7 @@
                                 size="large"
                                 autocomplete="current-password"
                                 autofocus
-                                placeholder="默认密码 diary"
+                                placeholder="输入密码"
                                 @keyup.enter="loginSubmit"
                             >
                                 <template #suffix>
@@ -49,11 +48,6 @@
                         </NButton>
                     </NForm>
 
-                    <div :class="['footer', {center: !is_show_demo_account}]">
-                        <NButton v-if="is_show_demo_account" quaternary type="primary" @click="useTestAccount">
-                            试用演示账户
-                        </NButton>
-                    </div>
                 </section>
 
                 <div class="copyright">
@@ -74,9 +68,7 @@ import userApi from "@/api/userApi.ts"
 
 import {popMessage, setAuthorization} from "@/utility.ts";
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
-import {useSystemConfigStore} from "@/pinia/useSystemConfigStore.ts";
 const projectStore = useProjectStore()
-const systemConfigStore = useSystemConfigStore()
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import SVG_ICONS from "@/assets/icons/SVG_ICONS.ts";
@@ -96,8 +88,6 @@ const password = ref('')
 const isPasswordVisible = ref(false)
 const loginLabel = ref('登录')
 const isLoggingIn = ref(false)
-const systemConfig = computed(() => systemConfigStore.config)
-const is_show_demo_account = computed(() => systemConfig.value.is_show_demo_account)
 const passwordVerified = computed(() => {
     return password.value.length > 0
 })
@@ -142,11 +132,6 @@ function loginSubmit() {
 
     }
 }
-
-function useTestAccount() {
-    password.value = systemConfig.value.demo_account_password
-}
-
 
 </script>
 <style lang="scss" scoped>
@@ -205,13 +190,6 @@ function useTestAccount() {
 .ios-login-heading{
     margin-bottom: 26px;
     text-align: center;
-    p{
-        margin-bottom: 6px;
-        color: var(--diary-accent);
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
     h1{
         margin: 0;
         color: var(--diary-ink);
@@ -232,9 +210,6 @@ function useTestAccount() {
         color: var(--diary-muted);
         font-weight: 600;
     }
-}
-.footer{
-    justify-content: center;
 }
 .copyright{
     width: 100%;

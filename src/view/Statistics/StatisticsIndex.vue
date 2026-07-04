@@ -1,7 +1,7 @@
 <template>
     <div class="statistic-container" :style="`min-height: ${projectStore.insets.windowsHeight}px`">
 
-        <PageHeader title="写作统计" subtitle="日记、天气和使用情况">
+        <PageHeader title="写作统计" subtitle="日记数量、类别和天气趋势">
             <div class="main-statistic">
                 <div class="main-statistic-item">
                     <div class="label">共享</div>
@@ -21,7 +21,6 @@
         <MenuPanelContainer v-else>
             <div class="statistic-content">
                 <StatisticCharts/>
-                <StatisticUsers/>
             </div>
         </MenuPanelContainer>
 
@@ -32,7 +31,6 @@
 import statisticApi from "@/api/statisticApi.ts"
 import PageHeader from "@/framework/pageHeader/PageHeader.vue"
 import Loading from "@/components/Loading.vue"
-import StatisticUsers from "@/view/Statistics/Users/StatisticUsers.vue";
 import StatisticCharts from "@/view/Statistics/Diary/StatisticCharts.vue";
 import {useStatisticStore} from "@/pinia/useStatisticStore.ts";
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
