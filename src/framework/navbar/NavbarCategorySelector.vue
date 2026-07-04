@@ -15,17 +15,12 @@
                 </button>
 
                 <button
-                    :class="['navbar-category-chip', 'share-item', {active: projectStore.isFilterShared}]"
+                    v-if="projectStore.filteredCategories.length"
+                    class="navbar-category-action"
                     type="button"
-                    title="只看公开日记"
-                    @click="toggleFilterShared"
-                >
-                    <span class="dot"></span>
-                    <span>公开</span>
-                </button>
-
-                <button class="navbar-category-action" type="button" title="反选分类" @click="reverseCategorySelect">反选</button>
-                <button class="navbar-category-action" type="button" title="清空分类筛选" @click="selectCategoryNone">清空</button>
+                    title="清空分类筛选"
+                    @click="selectCategoryNone"
+                >清空</button>
             </div>
         </div>
     </div>
@@ -35,22 +30,10 @@
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
 import {CategoryEntity} from "@/entity/Category.ts";
 import {useStatisticStore} from "@/pinia/useStatisticStore.ts";
-import {ref} from "vue";
 
 const projectStore = useProjectStore()
-const isAnimating = ref<number | null>(null)
 
-function toggleFilterShared(){
-    projectStore.SET_IS_FILTERED_SHARED(!projectStore.isFilterShared)
-    projectStore.isListNeedBeReload = true
-}
 function toggleCategory(category: CategoryEntity, index: number){
-    // Trigger animation
-    isAnimating.value = index
-    setTimeout(() => {
-        isAnimating.value = null
-    }, 300) // Match animation duration
-
     let idx = projectStore.filteredCategories.indexOf(category.name_en)
     if ( idx > -1) {
         projectStore.filteredCategories.splice(idx, 1)
@@ -65,15 +48,6 @@ function selectCategoryNone() {
     projectStore.SET_FILTERED_CATEGORIES([])
     projectStore.isListNeedBeReload = true
 }
-function reverseCategorySelect() {
-    let tempCategories: string[] = useStatisticStore().categoryAll.map(item => item.name_en)
-    projectStore.filteredCategories.forEach(item => {
-        tempCategories.splice(tempCategories.indexOf(item), 1)
-    })
-    projectStore.SET_FILTERED_CATEGORIES(tempCategories)
-    projectStore.isListNeedBeReload = true
-}
-
 
 // DOT STYLE
 function isCategoryActive(categoryName: string) {
@@ -131,13 +105,6 @@ function dotStyle(category: CategoryEntity) {
     gap: 7px;
     white-space: nowrap;
 
-    &.share-item{
-        .dot{
-            background: var(--diary-muted-2);
-            box-shadow: 0 0 0 3px rgba(142, 142, 147, 0.16);
-        }
-    }
-
     &:hover{
         background: rgba(0, 122, 255, 0.09);
         color: var(--diary-ink);
@@ -171,8 +138,7 @@ function dotStyle(category: CategoryEntity) {
 }
 
 @media (max-width: 1280px) {
-    .navbar-category-action,
-    .share-item{
+    .navbar-category-action{
         display: none;
     }
 }

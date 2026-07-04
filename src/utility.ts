@@ -226,7 +226,6 @@ export function temperatureProcessCTS(temperature: number | string) {
 }
 
 export interface DiaryConfigEntity {
-    isFilterShared: boolean, // 是否筛选共享日记
     keywords: string[], // 关键词
     filteredCategories: string[], // 筛选的日记类别
     dateFilterTimeStart: string, // YYYY-MM-DD HH:mm:ss
@@ -246,7 +245,6 @@ export function getDiaryConfigFromLocalStorage() {
                 dateFilterTimeStart = migrated.timeStart
                 dateFilterTimeEnd = migrated.timeEnd
                 const upgraded: DiaryConfigEntity = {
-                    isFilterShared: parsed.isFilterShared ?? false,
                     keywords: parsed.keywords ?? [],
                     filteredCategories: parsed.filteredCategories ?? useStatisticStore().categoryAll.map(item => item.name_en),
                     dateFilterTimeStart,
@@ -256,7 +254,6 @@ export function getDiaryConfigFromLocalStorage() {
             }
         }
         return {
-            isFilterShared: parsed.isFilterShared ?? false,
             keywords: parsed.keywords ?? [],
             filteredCategories: parsed.filteredCategories ?? useStatisticStore().categoryAll.map(item => item.name_en),
             dateFilterTimeStart,
@@ -265,7 +262,6 @@ export function getDiaryConfigFromLocalStorage() {
     } else {
         // 如果不存在配置，生成一个新的
         let newDiaryConfig: DiaryConfigEntity = {
-            isFilterShared: false, // 是否筛选共享日记
             keywords: [], // 关键词
             filteredCategories: useStatisticStore().categoryAll.map(item => item.name_en), // 筛选的日记类别
             dateFilterTimeStart: '',

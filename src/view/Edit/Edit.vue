@@ -471,7 +471,6 @@ const diaryHasChanged = computed(() => {
             diary.value.temperature_outside !== diaryOrigin.value.temperature_outside ||
             diary.value.weather !== diaryOrigin.value.weather ||
             diary.value.category !== diaryOrigin.value.category ||
-            diary.value.is_public !== diaryOrigin.value.is_public ||
             diary.value.is_markdown !== diaryOrigin.value.is_markdown ||
             diary.value.mood !== diaryOrigin.value.mood ||
             JSON.stringify(diary.value.tags || []) !== JSON.stringify(diaryOrigin.value.tags || []) ||
@@ -685,7 +684,7 @@ function getDiary(diaryId: number) {
             diary.value.category = tempDiary.category
             diary.value.date = new Date(tempDiary.date.replace(' ', 'T')) // safari 只识别 2020-10-27T14:35:33 格式的日期
             diary.value.weather = tempDiary.weather
-            diary.value.is_public = !!tempDiary.is_public
+            diary.value.is_public = false
             diary.value.is_markdown = !!tempDiary.is_markdown
             diary.value.temperature = temperatureProcessSTC(tempDiary.temperature)
             diary.value.temperature_outside = temperatureProcessSTC(tempDiary.temperature_outside)
@@ -747,7 +746,7 @@ function saveDiary() {
         temperature: temperatureProcessCTS(diary.value.temperature),
         temperature_outside: temperatureProcessCTS(diary.value.temperature_outside),
         weather: diary.value.weather,
-        is_public: diary.value.is_public ? 1 : 0,
+        is_public: 0,
         is_markdown: diary.value.is_markdown ? 1 : 0,
         date: dateFormatter(diary.value.date),
         mood: diary.value.mood,
@@ -893,7 +892,7 @@ function convertToServerVersion() { // 转换为数据库格式的日记
         category: diary.value.category,
         date_create: date,
         date_modify: "",
-        is_public: diary.value.is_public ? 1 : 0,
+        is_public: 0,
         is_markdown: diary.value.is_markdown ? 1 : 0,
         mood: diary.value.mood,
         tags: diary.value.tags,

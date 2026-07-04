@@ -360,7 +360,6 @@ async function exportFullDiary() {
             pageNo: 1,
             pageSize: 100000,
             categories: JSON.stringify([]),
-            filterShared: 0,
         })
         const fileName = `日记完整导出-${dateFormatter(new Date(), 'yyyy-MM-dd_hhmmss')}.json`
         downloadFile(fileName, JSON.stringify(res.data, null, 2))

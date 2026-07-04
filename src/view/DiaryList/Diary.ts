@@ -36,7 +36,6 @@ export interface EntityDiaryFromServerLocal extends EntityDiaryFromServer{
     // detail
     dateObj?: DateUtilityObject,
 
-    // share
     categoryString? : string,
     contentHtml? : string,
     nickname?: string,
@@ -66,7 +65,6 @@ export interface DiarySearchParams {
     pageNo: number,
     pageSize: number, // 单页请求条数
     categories: string,
-    filterShared?: 0|1, // 1 是筛选，0 是不筛选
     timeStart?: string, // YYYY-MM-DD HH:mm:ss
     timeEnd?: string,   // YYYY-MM-DD HH:mm:ss
 }

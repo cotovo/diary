@@ -7,13 +7,11 @@
                 v-model:keyword="keywordShow"
                 :categories="projectStore.filteredCategories"
                 :category-label-map="categoryLabelMap"
-                :is-shared-active="projectStore.isFilterShared"
                 :date-range-label="dateRangeLabel"
                 :has-active-filters="hasActiveFilters"
                 @search="search"
                 @clear="clearAllFilters"
                 @toggle-todo="toggleTodoFilter"
-                @toggle-shared="toggleSharedFilter"
             />
         </transition>
 
@@ -94,15 +92,13 @@ const formSearch = ref<DiarySearchParams>({
     pageNo: 1,
     pageSize: 100, // 单页请求条数
     categories: '',
-    filterShared: 0, // 1 是筛选，0 是不筛选
 })
 
 const hasActiveFilters = computed(() => {
     return projectStore.keywords.length > 0 ||
         projectStore.filteredCategories.length > 0 ||
         !!projectStore.dateFilterTimeStart ||
-        !!projectStore.dateFilterTimeEnd ||
-        projectStore.isFilterShared
+        !!projectStore.dateFilterTimeEnd
 })
 const dateRangeLabel = computed(() =>
     formatDiaryDateRangeLabel(projectStore.dateFilterTimeStart, projectStore.dateFilterTimeEnd)
@@ -269,16 +265,10 @@ function toggleTodoFilter() {
     projectStore.isListNeedBeReload = true
     reloadDiaryList()
 }
-function toggleSharedFilter() {
-    projectStore.SET_IS_FILTERED_SHARED(!projectStore.isFilterShared)
-    projectStore.isListNeedBeReload = true
-    reloadDiaryList()
-}
 function clearAllFilters() {
     projectStore.SET_KEYWORD([])
     projectStore.SET_FILTERED_CATEGORIES([])
     projectStore.SET_DATE_FILTER_STRING('')
-    projectStore.SET_IS_FILTERED_SHARED(false)
     keywordShow.value = ''
     search()
 }
@@ -306,7 +296,6 @@ function loadMore() {
     formSearch.value.categories = JSON.stringify(projectStore.filteredCategories)
     formSearch.value.timeStart = projectStore.dateFilterTimeStart || undefined
     formSearch.value.timeEnd = projectStore.dateFilterTimeEnd || undefined
-    formSearch.value.filterShared = projectStore.isFilterShared ? 1 : 0
     getDiaries(controller)
 }
 

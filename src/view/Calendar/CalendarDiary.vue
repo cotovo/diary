@@ -132,7 +132,6 @@ const formSearch = ref<DiarySearchParamsForCalendar>({
     pageNo: 1,
     pageSize: 9999, // 单页请求条数
     categories: '',
-    filterShared: 0, // 1 是筛选，0 是不筛选
 
     timeStart: Moment().startOf('year').format('YYYY-MM-DD'),
     timeEnd: Moment().endOf('year').format('YYYY-MM-DD'),
@@ -144,7 +143,6 @@ function getAllShowingCalendarDiaries() {
     formSearch.value.pageNo = 1
     formSearch.value.keywords = JSON.stringify(projectStore.keywords)
     formSearch.value.categories = JSON.stringify(projectStore.filteredCategories)
-    formSearch.value.filterShared = projectStore.isFilterShared ? 1 : 0
     formSearch.value.timeStart = minDate.value ? Moment(minDate.value).startOf('day').format('YYYY-MM-DD HH:mm:ss') : ''
     formSearch.value.timeEnd = maxDate.value ? Moment(maxDate.value).endOf('day').format('YYYY-MM-DD HH:mm:ss') : ''
     diaryList.value = []
@@ -228,7 +226,6 @@ function getDiaryListOfDay(day: CalendarDay) {
             timeEnd: Moment(day.date).endOf('day').format('YYYY-MM-DD HH:mm:ss'), 
             keywords: JSON.stringify(projectStore.keywords),
             categories: JSON.stringify(projectStore.filteredCategories),
-            filterShared: projectStore.isFilterShared ? 1 : 0,
         })
         .then(res => {
             focusedDayDiaries.value = res.data.map(diary => {

@@ -28,7 +28,6 @@ $bg-light-td-hover : black;
 $bg-main        : #373737;
 $bg-menu        : #4A4A4A;
 $bg-searchbar   : #E5E5EA;
-$bg-share       : #FFFDF8;
 $bg-setup       : #121212;
 $bg-setup-card  : color.adjust(black, $lightness: 18%);
 
@@ -36,7 +35,6 @@ $bg-setup-card  : color.adjust(black, $lightness: 18%);
 $color-border           : #ddd;
 $color-border-light     : color.adjust($color-border, $lightness: 5%);
 $color-border-highlight : color.adjust($color-border, $lightness: -15%);
-$color-border-share     : #F0E8DB;
 $color-border-menu      : #646464;
 $color-border-search-bar: #646464;
 $color-border-setup     : #4b4a4a;

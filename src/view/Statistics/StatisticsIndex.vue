@@ -4,10 +4,6 @@
         <PageHeader title="写作统计" subtitle="日记数量、类别和天气趋势">
             <div class="main-statistic">
                 <div class="main-statistic-item">
-                    <div class="label">共享</div>
-                    <div class="number value">{{ statisticStore.statisticsCategory.shared}}</div>
-                </div>
-                <div class="main-statistic-item">
                     <div class="label">总计</div>
                     <div class="number value">{{ statisticStore.statisticsCategory.amount }}</div>
                 </div>
@@ -54,7 +50,7 @@ function getStatistic() {
         .then(res => {
             statisticStore.statisticsCategory = res.data
             let keys = Object.keys(res.data)
-            keys = keys.filter(item =>  item !== 'amount' && item !== 'shared')
+            keys = keys.filter(item =>  item !== 'amount')
             statisticStore.dataArrayCategory =  keys.map(key => {
                 return {
                     name: statisticStore.categoryNameMap.get(key),

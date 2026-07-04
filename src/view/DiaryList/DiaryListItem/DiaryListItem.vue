@@ -52,11 +52,7 @@ const weatherIcon = computed(() => {
     if (props.isActive) {
         return SVG_ICONS.weather_icons[`${props.diary.weather}_white`]
     } else {
-        if (props.diary.is_public === 1) {
-            return SVG_ICONS.weather_icons[`${props.diary.weather}_active`]
-        } else {
-            return SVG_ICONS.weather_icons[props.diary.weather]
-        }
+        return SVG_ICONS.weather_icons[props.diary.weather]
     }
 })
 const diaryItemStyle = computed(() => {

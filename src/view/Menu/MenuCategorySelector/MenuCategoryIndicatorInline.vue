@@ -4,7 +4,6 @@
              v-for="(item, index) in useStatisticStore().categoryAll" :key="index"
              :style="`border-color: ${item.color}; ${indicatorItemStyle(item)}`"
         />
-        <div class="indicator-list-item" :style="projectStore.isFilterShared? 'background-color: white':''"/>
     </div>
 </template>
 

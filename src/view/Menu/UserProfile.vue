@@ -18,7 +18,6 @@
         <div v-if="statisticStore.statisticsCategory.amount > 0" class="statistics">
             <span v-if="userInfo?.city">{{ userInfo.city }}</span>
             <span>总计 {{ statisticStore.statisticsCategory.amount }} 篇</span>
-            <span v-if="statisticStore.statisticsCategory.shared > 0">共享 {{ statisticStore.statisticsCategory.shared }} 篇</span>
         </div>
 
         <div class="profile-actions">

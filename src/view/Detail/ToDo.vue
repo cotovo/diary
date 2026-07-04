@@ -256,7 +256,7 @@ function saveDiary(isShowNotification?: boolean){
         temperature: temperatureProcessCTS(props.diary.temperature),
         temperature_outside: temperatureProcessCTS(props.diary.temperature_outside),
         weather: props.diary.weather,
-        is_public: props.diary.is_public ? 1 : 0,
+        is_public: 0,
         is_markdown: props.diary.is_markdown ? 1 : 0,
         date: dateFormatter(new Date(props.diary.date)),
     }

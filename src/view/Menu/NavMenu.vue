@@ -275,7 +275,6 @@ function menuListClicked(menuName: string) {
             break
         case 'todo': {
             const nextCategories = isTodoFiltered.value ? [] : ['todo']
-            projectStore.isFilterShared = false
             projectStore.SET_FILTERED_CATEGORIES(nextCategories)
             projectStore.isListNeedBeReload = true
             menuInit()

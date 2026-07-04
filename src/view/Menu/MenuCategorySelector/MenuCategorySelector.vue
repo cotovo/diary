@@ -13,47 +13,25 @@
             </li>
         </ul>
 
-        <div class="menu-category-list category-operations-container">
-            <div :class="['menu-category-item', 'menu-category-shared', {active: projectStore.isFilterShared}]"
-                 role="button"
-                 tabindex="0"
-                 @click="toggleFilterShared"
-                 @keydown.enter.prevent="toggleFilterShared"
-                 @keydown.space.prevent="toggleFilterShared">共享日记</div>
-
-        </div>
-
-        <div class="menu-category-list category-operations-container">
-            <NButton secondary strong @click="selectCategoryAll">全选</NButton>
-            <NButton secondary strong @click="reverseCategorySelect">反选</NButton>
-        </div>
+        <button
+            v-if="projectStore.filteredCategories.length"
+            class="menu-category-clear"
+            type="button"
+            @click="clearCategories"
+        >
+            清空分类筛选
+        </button>
     </MenuPanelContainer>
 </template>
 
 <script lang="ts" setup>
 
-import {onMounted, ref, watch} from "vue";
-import {getDiaryConfigFromLocalStorage} from "@/utility.ts";
 import {useProjectStore} from "@/pinia/useProjectStore.ts";
 import {CategoryEntity} from "@/entity/Category.ts";
 import MenuPanelContainer from "@/framework/MenuPanelContainer.vue";
 import {useStatisticStore} from "@/pinia/useStatisticStore.ts";
-import {NButton} from "naive-ui";
 const projectStore = useProjectStore()
 
-const filterShared = ref(false) // 是否筛选已共享的日记
-
-onMounted(()=>{
-    filterShared.value = getDiaryConfigFromLocalStorage().isFilterShared
-})
-
-watch(filterShared, newValue => {
-    projectStore.isFilterShared = newValue
-})
-
-function toggleFilterShared(){
-    projectStore.SET_IS_FILTERED_SHARED(!projectStore.isFilterShared)
-}
 function toggleCategory(category: CategoryEntity){
     let index = projectStore.filteredCategories.indexOf(category.name_en)
     if ( index > -1) {
@@ -71,15 +49,9 @@ function categoryMenuItemStyle(category: CategoryEntity){
         return ``
     }
 }
-function selectCategoryAll() {
-    projectStore.SET_FILTERED_CATEGORIES(useStatisticStore().getCategoryAllFromLocalStorage().map(item => item.name_en))
-}
-function reverseCategorySelect() {
-    let tempCategories = [].concat(useStatisticStore().categoryAll.map(item => item.name_en))
-    projectStore.filteredCategories.forEach(item => {
-        tempCategories.splice(tempCategories.indexOf(item), 1)
-    })
-    projectStore.SET_FILTERED_CATEGORIES(tempCategories)
+function clearCategories() {
+    projectStore.SET_FILTERED_CATEGORIES([])
+    projectStore.isListNeedBeReload = true
 }
 
 </script>

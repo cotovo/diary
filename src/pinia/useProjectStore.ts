@@ -21,7 +21,6 @@ export const useProjectStore = defineStore('projectStore', {
         isDarkTheme: false, // 系统主题检测 (prefers-color-scheme: dark)
 
         // LIST FILTER
-        isFilterShared: false ,                         // 是否筛选共享的日记
         dateFilterTimeStart: '' ,                       // 日期筛选开始时间（对应接口 timeStart）
         dateFilterTimeEnd: '' ,                         // 日期筛选结束时间（对应接口 timeEnd）
         keywords: [] as string[] ,                      // 搜索关键字
@@ -84,7 +83,6 @@ export const useProjectStore = defineStore('projectStore', {
             this.keywords = diaryConfig.keywords
             this.dateFilterTimeStart = diaryConfig.dateFilterTimeStart
             this.dateFilterTimeEnd = diaryConfig.dateFilterTimeEnd
-            this.isFilterShared = diaryConfig.isFilterShared
 
             // Initialize system theme detection
             this.detectSystemTheme()
@@ -110,13 +108,6 @@ export const useProjectStore = defineStore('projectStore', {
             if (typeof window !== 'undefined' && window.matchMedia) {
                 this.isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
             }
-        },
-        // 设置是否显示共享
-        SET_IS_FILTERED_SHARED (payload: boolean){
-            this.isFilterShared = payload
-            let diaryConfig = getDiaryConfigFromLocalStorage()
-            diaryConfig.isFilterShared = payload
-            setDiaryConfig(diaryConfig)
         },
         // 设置类别筛选
         SET_FILTERED_CATEGORIES(payload: string[]){

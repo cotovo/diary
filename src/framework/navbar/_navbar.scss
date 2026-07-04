@@ -47,17 +47,21 @@
   gap: 4px;
 
   &.editor-action-group {
-    min-height: 34px;
-    padding: 2px;
-    gap: 2px;
-    border: 1px solid var(--diary-border);
+    min-height: 36px;
+    padding: 3px;
+    gap: 4px;
+    border: 1px solid color-mix(in srgb, var(--diary-border) 82%, transparent);
     border-radius: 8px;
-    background: color-mix(in srgb, var(--diary-surface) 92%, transparent);
-    box-shadow: var(--diary-hairline-shadow);
-    transition: border-color var(--diary-transition), background-color var(--diary-transition);
+    background: color-mix(in srgb, var(--diary-surface) 94%, transparent);
+    box-shadow: 0 8px 22px rgba(29, 29, 31, 0.08);
+    transition:
+      border-color var(--diary-transition),
+      background-color var(--diary-transition),
+      box-shadow var(--diary-transition);
 
     &.dirty {
       border-color: color-mix(in srgb, var(--diary-accent) 28%, var(--diary-border));
+      box-shadow: 0 8px 22px rgba(0, 122, 255, 0.12);
     }
   }
 }
@@ -87,28 +91,30 @@
 }
 
 .editor-recover-button {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   border-radius: 8px;
+  color: var(--diary-muted);
 
   &:hover {
-    background: var(--diary-surface-muted);
+    background: rgba(255, 159, 10, 0.12);
+    color: var(--diary-warning);
   }
 }
 
 .nav-save-button {
-  min-width: 74px;
-  height: 30px;
-  padding: 0 10px;
+  min-width: 82px;
+  height: 32px;
+  padding: 0 12px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 720;
-  box-shadow: 0 5px 12px rgba(0, 122, 255, 0.18);
+  box-shadow: 0 6px 14px rgba(0, 122, 255, 0.2);
 
   &.saved {
     color: var(--diary-success);
-    background: color-mix(in srgb, var(--diary-success) 12%, transparent);
+    background: color-mix(in srgb, var(--diary-success) 10%, var(--diary-surface));
     border-color: color-mix(in srgb, var(--diary-success) 28%, var(--diary-border));
     box-shadow: none;
 
@@ -274,13 +280,17 @@
   }
 
   .nav-action-group.editor-action-group {
-    min-height: 38px;
+    min-height: 40px;
     padding: 3px;
   }
 
+  .editor-recover-button,
   .nav-save-button {
-    height: 32px;
-    min-width: 76px;
+    height: 34px;
+  }
+
+  .nav-save-button {
+    min-width: 82px;
   }
 
   #toast .toast {

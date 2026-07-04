@@ -111,7 +111,7 @@ export const useStatisticStore = defineStore('statisticStore', {
         // 设置类别数据
         setDataArrayCategory(statisticsCategory) {
             let keys = Object.keys(statisticsCategory)
-            keys = keys.filter(item => item !== 'amount' && item !== 'shared')
+            keys = keys.filter(item => item !== 'amount')
             this.dataArrayCategory = keys.map(key => {
                 return {
                     name: this.categoryNameMap.get(key),

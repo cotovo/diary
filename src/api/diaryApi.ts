@@ -88,13 +88,6 @@ export default {
     }> {
         return request('get', params, null, 'diary/get-diary-content-with-keyword')
     },
-    share(params: {diaryId: number}): Promise<{
-        success: boolean,
-        data: EntityDiaryFromServer,
-        message: string
-    }> {
-        return request('get',    params, null,'diary/share')},
-
     // 导出用户所有日记
     export(params: DiarySearchParams)  {
         return request('get'   , params, null, 'diary/export', 120000)}  ,

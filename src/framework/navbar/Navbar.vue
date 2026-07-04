@@ -152,17 +152,6 @@
 
                 <div class="nav-action-group" v-if="route.name === 'Detail' && projectStore.currentDiary">
                     <NButton
-                        v-if="projectStore.currentDiary && projectStore.currentDiary.is_public === 1"
-                        quaternary
-                        circle
-                        class="nav-icon-button clipboard-trigger"
-                        :data-clipboard="shareUrl"
-                        title="复制分享链接"
-                        aria-label="复制分享链接"
-                    >
-                        <template #icon><Share2 :size="19"/></template>
-                    </NButton>
-                    <NButton
                         quaternary
                         circle
                         class="nav-icon-button danger"
@@ -277,15 +266,13 @@ import {
     Pencil,
     Plus,
     Search,
-    Share2,
     Tags,
     Trash2,
     Undo2,
     X,
 } from "@lucide/vue"
 import {NButton} from "naive-ui"
-import ClipboardJS from "clipboard"
-import {computed, nextTick, onMounted, onUnmounted, ref} from "vue"
+import {computed, nextTick, ref} from "vue"
 import {useRoute, useRouter} from "vue-router"
 import diaryApi from "@/api/diaryApi.ts"
 import {EnumListStyle} from "@/listStyle.ts"
@@ -300,10 +287,8 @@ const projectStore = useProjectStore()
 const route = useRoute()
 const router = useRouter()
 const navMenuRef = ref<InstanceType<typeof NavMenu>>()
-const clipboard = ref<ClipboardJS>()
 const toastPosition = ref({x: 0, y: 0})
 const isToastShowed = ref(false)
-let location = window.location
 
 const EDIT_ROUTE_NAMES = ['Edit', 'EditNew', 'CalendarEdit', 'CalendarEditNew'] as const
 const isEditingRoute = computed(() => EDIT_ROUTE_NAMES.includes(route.name as typeof EDIT_ROUTE_NAMES[number]))
@@ -341,24 +326,6 @@ const showMobileBrand = computed(() =>
 const listStyleTitle = computed(() =>
     projectStore.listStyle === EnumListStyle.list ? '切换到详情列表' : '切换到简洁列表'
 )
-const shareUrl = computed(() => {
-    const id = projectStore.currentDiary?.id
-    return id ? `${location.origin}/diary/#/share/${id}` : ''
-})
-
-onMounted(() => {
-    location = window.location
-    clipboard.value = new ClipboardJS('.clipboard-trigger', {
-        text: trigger => trigger.getAttribute('data-clipboard') || '',
-    })
-    clipboard.value.on('success', () => {
-        popMessage('success', '分享链接已复制到剪贴板', () => {}, 2)
-    })
-})
-
-onUnmounted(() => {
-    clipboard.value?.destroy()
-})
 
 function addNewDiary() {
     if (projectStore.cacheDiary) {
@@ -429,7 +396,6 @@ function toggleSearchbar() {
 }
 
 function toggleTodoList() {
-    projectStore.isFilterShared = false
     projectStore.SET_FILTERED_CATEGORIES(isTodoOnly.value ? [] : ['todo'])
     projectStore.isListNeedBeReload = true
 }

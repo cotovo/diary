@@ -220,7 +220,7 @@ function publicRoute(route) {
     "system-config",
     "user/login",
     "diary-category/list",
-  ].includes(route) || route === "diary/share";
+  ].includes(route);
 }
 
 async function requireAuth(req, res, route) {
@@ -379,7 +379,6 @@ async function filterEntries(params) {
   const index = await readIndex();
   const keywords = parseMaybeJson(params.get("keywords"), []);
   const categories = parseMaybeJson(params.get("categories"), []);
-  const filterShared = params.get("filterShared") === "1";
   const timeStart = params.get("timeStart");
   const timeEnd = params.get("timeEnd");
   const start = timeStart ? new Date(String(timeStart).replace(" ", "T")).getTime() : null;
@@ -404,10 +403,9 @@ async function filterEntries(params) {
         const lower = String(keyword).toLowerCase();
         return `${entry.title}\n${entry.content}`.toLowerCase().includes(lower);
       });
-      const shareOk = !filterShared || entry.is_public === 1;
       const startOk = !start || dateTime >= start;
       const endOk = !end || dateTime <= end;
-      return categoryOk && keywordOk && shareOk && startOk && endOk;
+      return categoryOk && keywordOk && startOk && endOk;
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || b.id - a.id);
 }
@@ -958,7 +956,7 @@ async function handleApi(req, res, route, params) {
     ok(res, list.map(({ id, date, category }) => ({ id, date, category })));
     return;
   }
-  if (["diary/detail", "diary/share"].includes(route) && req.method === "GET") {
+  if (route === "diary/detail" && req.method === "GET") {
     const diaryId = Number(params.get("diaryId") || params.get("id"));
     const index = await readIndex();
     const entry = index.entries.find((item) => Number(item.id) === diaryId);
@@ -1027,7 +1025,7 @@ async function handleApi(req, res, route, params) {
 
   if (route === "statistic/category" && req.method === "GET") {
     const list = await filterEntries(new URLSearchParams());
-    const stat = { amount: list.length, shared: list.filter((item) => item.is_public === 1).length };
+    const stat = { amount: list.length };
     for (const category of categories) stat[category.name_en] = 0;
     for (const diary of list) stat[diary.category] = (stat[diary.category] || 0) + 1;
     ok(res, stat);

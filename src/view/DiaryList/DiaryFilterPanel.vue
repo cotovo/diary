@@ -21,15 +21,6 @@
                 待办
             </NButton>
             <NButton
-                size="small"
-                :type="isSharedActive ? 'primary' : 'default'"
-                secondary
-                @click="emit('toggleShared')"
-            >
-                <template #icon><Globe2 :size="16"/></template>
-                公开
-            </NButton>
-            <NButton
                 v-if="hasActiveFilters"
                 size="small"
                 quaternary
@@ -57,13 +48,12 @@
 <script lang="ts" setup>
 import {computed} from "vue"
 import {NButton, NInput, NTag} from "naive-ui"
-import {Globe2, ListTodo, Search, X} from "@lucide/vue"
+import {ListTodo, Search, X} from "@lucide/vue"
 
 const props = defineProps<{
     keyword: string
     categories: string[]
     categoryLabelMap: Record<string, string>
-    isSharedActive: boolean
     dateRangeLabel: string
     hasActiveFilters: boolean
 }>()
@@ -73,7 +63,6 @@ const emit = defineEmits<{
     search: []
     clear: []
     toggleTodo: []
-    toggleShared: []
 }>()
 
 const isTodoActive = computed(() =>
@@ -86,9 +75,7 @@ const summaryItems = computed(() => {
     if (props.categories.length) {
         items.push(...props.categories.map(item => props.categoryLabelMap[item] || item))
     }
-    if (props.isSharedActive) items.push('仅公开')
     if (props.dateRangeLabel) items.push(props.dateRangeLabel)
     return items
 })
 </script>
-

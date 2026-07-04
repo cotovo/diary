@@ -38,7 +38,6 @@ const routes: RouteRecordRaw[] = [
             {name: 'CalendarPeriodEdit',path: 'calendar-period/:id'  ,      component: () => import('@/view/Calendar/CalendarPeriod.vue')},
         ]
     },
-    {name: 'Share',                path: '/share/:id',         component: () => import('@/view/Share/Share.vue')},
     {name: 'SystemConfig',         path: '/system-config',      component: () => import('@/view/SystemConfig/SystemConfigPage.vue'), meta: {requiresAdmin: true} },
     {name: 'Login',                path: '/login',             component: Login},
     {name: 'Statistics',           path: '/statistics',        component: () => import('@/view/Statistics/StatisticsIndex.vue') },
@@ -56,8 +55,6 @@ router.beforeEach((to, _) => {
             if (getAuthorization()?.email) {
                 return {name: 'Index'}
             }
-            return true
-        case 'Share':
             return true
         default:
             if (getAuthorization() && getAuthorization()!.email) {
