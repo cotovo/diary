@@ -61,15 +61,6 @@ export interface EntityDiaryListOperation {
 }
 
 
-export interface EntityDiaryWaterfall extends EntityDiaryFromServerLocal{
-    position: {
-        top: number,
-        left: number,
-        col: number
-    }
-}
-
-
 export interface DiarySearchParams {
     keywords: Array<string> | string, // 关键字 JSON string 后的内容 : string[]
     pageNo: number,

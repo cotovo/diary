@@ -76,7 +76,6 @@ import MenuPanelContainer from "@/framework/MenuPanelContainer.vue";
 import {
     BarChart3,
     CalendarDays,
-    LayoutGrid,
     ListTodo,
     ScrollText,
     Search,
@@ -179,15 +178,6 @@ const menuGroups = computed<MenuGroup[]>(() => [
                 isNeedAdmin: false,
                 icon: BarChart3,
                 onClick: () => goToPage('Statistics')
-            },
-            {
-                name: '瀑布',
-                description: '卡片流浏览',
-                isShowInMobile: true,
-                isShowInPC: true,
-                isNeedAdmin: false,
-                icon: LayoutGrid,
-                onClick: () => goToPage('WaterfallList')
             }
         ]
     },

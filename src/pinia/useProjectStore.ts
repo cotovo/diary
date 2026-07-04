@@ -33,7 +33,6 @@ export const useProjectStore = defineStore('projectStore', {
         currentDiary: {} as EntityDiaryForm,                // 当前日记
 
         listStyle: EnumListStyle.list ,                 // 日记列表是否显示为全部内容
-        waterFallItemCount: 0, // 瀑布流展示的日记数量
 
 
         isDiaryNeedToBeSaved: false ,                   // 日记需要被存储
@@ -46,10 +45,6 @@ export const useProjectStore = defineStore('projectStore', {
         editLogoImg: SVG_ICONS.logo_icons.logo ,        // 编辑页LOGO
         editingDiaryTitle: '',                          // 编辑页当前日记标题（navbar 展示）
         listOperation: {} as EntityDiaryListOperation ,       // 列表页的操作，增删改操作，一般不再重新加载列表
-
-
-        // BILL
-        moneyAccuracy: 1, // 展示的货币精度，小数位数
 
         cacheDiary: undefined as (EntityDiaryForm | undefined),                // 缓存日记，目前只用于屏幕变换时，恢复日记内容
         cacheDiaryOrigin: undefined as (EntityDiaryForm | undefined),          // 跟上面同步使用：用于恢复用户之前的编辑状态，同时恢复当时的原日记内容，恢复 “日记已被编辑” 的状态

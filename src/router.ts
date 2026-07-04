@@ -38,15 +38,6 @@ const routes: RouteRecordRaw[] = [
             {name: 'CalendarPeriodEdit',path: 'calendar-period/:id'  ,      component: () => import('@/view/Calendar/CalendarPeriod.vue')},
         ]
     },
-    {
-        name: 'Waterfall',
-        path: '/waterfall',
-        redirect: '/waterfall/list',
-        component: () => import('@/framework/WaterfallFramework.vue'),
-        children: [
-            {name: 'WaterfallList'   , path: 'list'      ,     component: () => import('@/view/DiaryListWaterfall/WaterfallList.vue')},
-        ]
-    },
     {name: 'Share',                path: '/share/:id',         component: () => import('@/view/Share/Share.vue')},
     {name: 'SystemConfig',         path: '/system-config',      component: () => import('@/view/SystemConfig/SystemConfigPage.vue'), meta: {requiresAdmin: true} },
     {name: 'Login',                path: '/login',             component: Login},

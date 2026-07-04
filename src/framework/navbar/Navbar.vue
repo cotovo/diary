@@ -307,7 +307,7 @@ let location = window.location
 
 const EDIT_ROUTE_NAMES = ['Edit', 'EditNew', 'CalendarEdit', 'CalendarEditNew'] as const
 const isEditingRoute = computed(() => EDIT_ROUTE_NAMES.includes(route.name as typeof EDIT_ROUTE_NAMES[number]))
-const isListLikeRoute = computed(() => route.name === 'List' || route.name === 'WaterfallList')
+const isListLikeRoute = computed(() => route.name === 'List')
 const isNewDiary = computed(() => !route.params.id)
 const isTodoOnly = computed(() => projectStore.filteredCategories.length === 1 && projectStore.filteredCategories[0] === 'todo')
 const editingDiaryTitle = computed(() => projectStore.editingDiaryTitle.replace(/\s+/g, ' ').trim())
