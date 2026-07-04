@@ -1,9 +1,12 @@
 <template>
     <div class="word-explode">
         <div class="operation-list">
-            <ButtonSmall class="mr-1" @click="selectNone">取消选择</ButtonSmall>
-            <ButtonSmall class="mr-1" @click="selectAll">全选</ButtonSmall>
-            <ButtonSmall class="mr-1" type="confirm" @click="copySelectedWords">复制</ButtonSmall>
+            <NButton size="small" secondary @click="selectNone">取消选择</NButton>
+            <NButton size="small" secondary @click="selectAll">全选</NButton>
+            <NButton size="small" type="primary" @click="copySelectedWords">
+                <template #icon><Copy :size="15"/></template>
+                复制
+            </NButton>
         </div>
         <div class="word-list" ref="refWordList">
             <template  v-for="(item, index) in wordArray"
@@ -26,7 +29,8 @@
 <script lang="ts" setup>
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {popMessage} from "@/utility.ts";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import {NButton} from "naive-ui";
+import {Copy} from "@lucide/vue";
 
 const props = defineProps({
     content: {
@@ -191,7 +195,9 @@ function isCombination(newChar: string, oldChar: string): boolean {
 .operation-list{
     margin-bottom: 20px;
     display: flex;
+    gap: 8px;
     justify-content: flex-start;
+    flex-wrap: wrap;
 }
 
 .word-list{
@@ -204,11 +210,11 @@ function isCombination(newChar: string, oldChar: string): boolean {
         font-size: $fz-main;
         padding: 2px 4px;
         border: 1px solid $color-border;
-        border-radius: 3px;
+        border-radius: var(--diary-radius-sm);
         &.active{
-            background-color: $color-main;
-            border-color: $bg-menu;
-            color: black;
+            background-color: rgba(0, 122, 255, 0.12);
+            border-color: var(--diary-accent);
+            color: var(--diary-accent);
         }
         &.space{
             padding-left: 0;

@@ -1,17 +1,22 @@
 <template>
     <div class="page-header">
-        <div class="page-back-btn" @click="router.back()">
-            <TabIcon icon="关闭"/>
+        <NButton class="page-back-btn" quaternary circle aria-label="返回" @click="router.back()">
+            <template #icon><X :size="19"/></template>
+        </NButton>
+        <div class="page-heading">
+            <div class="page-title">{{ title }}</div>
+            <div class="page-subtitle" v-if="subtitle">{{ subtitle }}</div>
         </div>
-        <div class="page-title">{{ title }}</div>
-        <div class="page-subtitle">{{ subtitle }}</div>
-        <slot/>
+        <div class="page-actions">
+            <slot/>
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import TabIcon from "@/components/TabIcon.vue";
 import {useRouter} from "vue-router";
+import {NButton} from "naive-ui";
+import {X} from "@lucide/vue";
 const router = useRouter()
 
 withDefaults(defineProps<{

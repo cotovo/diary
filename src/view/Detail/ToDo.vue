@@ -43,20 +43,30 @@
                         </template>
                     </div>
                     <div v-if="isEditable" class="item-actions">
-                        <TabIcon
-                            size="small"
-                            icon="黑色-编辑"
-                            :title="isItemEditing(item) ? '完成' : '编辑'"
+                        <NButton
+                            size="tiny"
+                            quaternary
+                            circle
+                            :aria-label="isItemEditing(item) ? '完成编辑' : '编辑待办'"
                             @mousedown.prevent
                             @click="toggleItemEdit(item)"
-                        />
-                        <TabIcon
-                            size="small"
-                            icon="黑色-删除"
-                            title="删除"
+                        >
+                            <template #icon>
+                                <Check v-if="isItemEditing(item)" :size="15"/>
+                                <Pencil v-else :size="15"/>
+                            </template>
+                        </NButton>
+                        <NButton
+                            size="tiny"
+                            quaternary
+                            circle
+                            type="error"
+                            aria-label="删除待办"
                             @mousedown.prevent
                             @click="deleteTodo(item.id)"
-                        />
+                        >
+                            <template #icon><Trash2 :size="15"/></template>
+                        </NButton>
                     </div>
                 </div>
             </template>
@@ -74,7 +84,9 @@
                 placeholder="添加待办事项，回车确认"
                 @keydown.enter.prevent="submitNewTodo"
             />
-            <TabIcon size="small" icon="黑色-添加" title="添加" @click="submitNewTodo"/>
+            <NButton size="small" quaternary circle aria-label="添加待办" @click="submitNewTodo">
+                <template #icon><Plus :size="16"/></template>
+            </NButton>
         </div>
     </div>
 </template>
@@ -88,10 +100,12 @@ import {useProjectStore} from "@/pinia/useProjectStore.ts";
 import draggable from 'vuedraggable';
 import { TodoEntity } from '@/entity/Todo';
 import { useStatisticStore } from '@/pinia/useStatisticStore.ts';
-import TabIcon from "@/components/TabIcon.vue";
+import {NButton, useDialog} from "naive-ui";
+import {Check, Pencil, Plus, Trash2} from "@lucide/vue";
 
 const projectStore = useProjectStore();
 const statisticStore = useStatisticStore();
+const dialog = useDialog()
 
 
 
@@ -260,11 +274,19 @@ function saveDiary(isShowNotification?: boolean){
 
 function deleteTodo(id: number){
     if (!isEditable.value) return
-    if (editingItemId.value === id) {
-        editingItemId.value = null
-    }
-    todoList.value = todoList.value.filter(item => item.id !== id)
-    saveDiary()
+    dialog.warning({
+        title: '删除待办',
+        content: '这条待办会从当前日记中移除。',
+        positiveText: '删除',
+        negativeText: '取消',
+        onPositiveClick: () => {
+            if (editingItemId.value === id) {
+                editingItemId.value = null
+            }
+            todoList.value = todoList.value.filter(item => item.id !== id)
+            saveDiary()
+        }
+    })
 }
 
 function submitNewTodo(){

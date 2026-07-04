@@ -6,15 +6,15 @@
 
 .todo-list-item{
   cursor: grab;
-  border-radius: 3px;
-  padding-left: 15px;
+  border-radius: var(--diary-radius);
+  padding-left: 10px;
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
   align-items: flex-start;
   &.editing{
     cursor: default;
-    background-color: $bg-light;
+    background-color: var(--diary-surface-muted);
     .item-actions{
       opacity: 1;
     }
@@ -36,7 +36,9 @@
     flex-flow: row nowrap;
     flex-shrink: 0;
     opacity: 0;
+    gap: 2px;
     margin-top: 2px;
+    min-height: 32px;
     transition: opacity 0.15s;
   }
 
@@ -47,7 +49,7 @@
     padding: 7px 7px;
     flex: 1;
     min-width: 0;
-    border-bottom: 1px solid $color-border-light;
+    border-bottom: 1px solid var(--diary-border);
     .content{
       margin-right: 5px;
       line-height: 1.3;
@@ -92,7 +94,7 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding-left: 15px;
+  padding-left: 10px;
   margin-top: 4px;
   .checkbox-wrapper{
     margin-right: 6px;
@@ -103,6 +105,7 @@
     min-width: 0;
     border: none;
     background: transparent;
+    min-height: 40px;
     padding: 7px;
     outline: none;
     font-size: inherit;
@@ -121,8 +124,8 @@ div.checkbox{
   height: $checkbox-size;
   width: $checkbox-size;
   border-radius: 20px;
-  border: 1px solid $text-label;
-  background-color: white;
+  border: 1px solid var(--diary-border-strong);
+  background-color: var(--diary-surface);
   cursor: pointer;
   @extend .btn-like;
   &:hover{
@@ -189,7 +192,7 @@ div.checkbox.add-placeholder{
     }
 
     &:hover{
-      background-color: $dark-bg-nav;
+    background-color: $dark-bg-nav;
     }
     &.editing{
       background-color: $dark-bg-nav;
@@ -206,6 +209,6 @@ div.checkbox.add-placeholder{
   }
 
   div.checkbox {
-    background-color: $dark-bg;
+    background-color: var(--diary-surface);
   }
 }

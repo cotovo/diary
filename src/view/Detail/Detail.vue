@@ -20,13 +20,23 @@
                 >{{ projectStore.isHideContent ? diary.title.replace(/[^，。 \n]/g, '*') : diary.title }}</h2>
                 <div class="toolbar" v-if="!projectStore.isInMobileMode">
                     <template v-if="diary.category === 'todo'">
-                        <ButtonSmall class="clipboard" v-if="hasHideAllCompletedTodoItems" @click="toggleTodoList">显示已完成事项</ButtonSmall>
-                        <ButtonSmall class="clipboard" v-else @click="toggleTodoList">隐藏已完成事项</ButtonSmall>
+                        <NButton size="small" secondary @click="toggleTodoList">
+                            <template #icon>
+                                <Eye v-if="hasHideAllCompletedTodoItems" :size="15"/>
+                                <EyeOff v-else :size="15"/>
+                            </template>
+                            {{ hasHideAllCompletedTodoItems ? '显示已完成' : '隐藏已完成' }}
+                        </NButton>
                     </template>
 
-                    <ButtonSmall class="clipboard ml-2" v-if="isShowExplode" @click="toggleContentType">普通</ButtonSmall>
-                    <ButtonSmall class="clipboard ml-2" v-else @click="toggleContentType">炸词</ButtonSmall>
-                    <ButtonSmall class="clipboard ml-2" :data-clipboard="`${diary.title}\n------------------------\n${diary.content}`">复制标题和内容</ButtonSmall>
+                    <NButton size="small" secondary @click="toggleContentType">
+                        <template #icon><Sparkles :size="15"/></template>
+                        {{ isShowExplode ? '普通阅读' : '炸词阅读' }}
+                    </NButton>
+                    <NButton size="small" secondary @click="copyTitleAndContent">
+                        <template #icon><Copy :size="15"/></template>
+                        复制全文
+                    </NButton>
                 </div>
             </div>
 
@@ -75,7 +85,8 @@ import WordExplode from "@/view/Detail/WordExplode.vue";
 import ToDo from "./ToDo.vue";
 import {EntityDiaryFromServer} from "@/view/DiaryList/Diary.ts";
 import {LunarDateEntity} from "@/entity/LunarDate.ts";
-import ButtonSmall from "@/components/ButtonSmall.vue";
+import {NButton} from "naive-ui";
+import {Copy, Eye, EyeOff, Sparkles} from "@lucide/vue";
 
 import {popMessage, dateProcess, temperatureProcessSTC} from "@/utility.ts";
 

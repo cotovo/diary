@@ -1,117 +1,107 @@
 <template>
-    <PageHeader title="文件列表" subtitle="">
-        <TabIcon @click="showModalUpload" icon="添加"/>
+    <PageHeader title="文件列表" subtitle="上传和管理日记附件">
+        <NButton type="primary" size="small" @click="showModalUpload">
+            <template #icon><Upload :size="16"/></template>
+            上传
+        </NButton>
     </PageHeader>
+
     <MenuPanelContainer>
-        <div v-if="isLoading" class="pt-8 pb-8">
+        <div v-if="isLoading" class="file-loading">
             <Loading :loading="isLoading"/>
         </div>
-        <div
-            v-else
-            class="file-list"
-            v-if="fileListData.length > 0"
-        >
+        <div v-else-if="fileListData.length > 0" class="file-list">
             <FileListItem
-                :fileInfo="file"
                 v-for="file in fileListData"
                 :key="file.id"
+                :fileInfo="file"
                 @refresh-list="getFileList"
-                @modifyFileName="showModalModifyFileName(fileId)"
             />
         </div>
+        <ModernEmptyState
+            v-else
+            title="还没有文件"
+            description="上传常用附件后，可以在这里复制地址或重新命名。"
+            :icon="FolderOpen"
+        />
     </MenuPanelContainer>
 
-    <Modal v-if="modalUpload">
-        <form class="modal-form-panel" method="post" id="formUpload" @submit.prevent="uploadFile">
-            <div class="input-group">
-                <label for="name" >文件名称</label>
-                <input v-model.lazy="formUpload.name" type="text" name="name" id="name">
-            </div>
-            <div class="input-group">
-                <label for="file">文件</label>
-                <input onchange="handleFileInput" name="password" type="file" id="file">
+    <NModal v-model:show="modalUpload" preset="card" title="上传文件" class="file-modal">
+        <NForm label-placement="top" @submit.prevent="uploadFile">
+            <NFormItem label="文件名称">
+                <NInput v-model:value="formUpload.name" placeholder="给文件起一个容易识别的名字"/>
+            </NFormItem>
+            <NFormItem label="文件">
                 <FileSelector @fileChange="handleFileChange"/>
+            </NFormItem>
+            <div class="modal-actions">
+                <NButton @click="modalUpload = false">取消</NButton>
+                <NButton type="primary" :loading="isUploading" @click="uploadFile">上传</NButton>
             </div>
-            <button class="btn mt-8 btn-active" type="submit">上传</button>
-            <button class="btn mt-2" @click="modalUpload = false" type="submit">取消</button>
-        </form>
-    </Modal>
-
-
+        </NForm>
+    </NModal>
 </template>
 
 <script lang="ts" setup>
 import Loading from "@/components/Loading.vue"
-import ClipboardJS from "clipboard"
-import TabIcon from "@/components/TabIcon.vue"
-import PageHeader from "@/framework/pageHeader/PageHeader.vue"
 import fileManagerApi from "@/api/fileManagerApi.ts";
 import FileListItem from "./FileListItem.vue";
-import Modal from "@/components/Modal.vue";
 import FileSelector from "@/components/FileSelector.vue";
-
+import ModernEmptyState from "@/components/ui/ModernEmptyState.vue";
 import {popMessage, dateFormatter} from "@/utility.ts";
-import {onMounted, onUnmounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import MenuPanelContainer from "@/framework/MenuPanelContainer.vue";
+import PageHeader from "@/framework/pageHeader/PageHeader.vue"
+import {NButton, NForm, NFormItem, NInput, NModal} from "naive-ui";
+import {FolderOpen, Upload} from "@lucide/vue";
+import type {EntityFile} from "@/view/FileManager/File.ts";
 
 const isLoading = ref(false)
-const fileListData = ref([])
-const clipboard = ref(null) // clipboard obj
+const isUploading = ref(false)
+const fileListData = ref<EntityFile[]>([])
 const pager = ref({
     pageSize: 300,
     pageNo: 1,
     total: 0
 })
 
-const modalUpload = ref(false) // 文件上传
-const formUpload = ref({
+const modalUpload = ref(false)
+const formUpload = ref<{
+    name: string
+    file: File | null
+}>({
     name: '',
     file: null
 })
 
 onMounted(() => {
     getFileList()
-    // 绑定剪贴板操作方法
-    clipboard.value = new ClipboardJS('.clipboard', {
-        text: trigger => {
-            return trigger.getAttribute('data-clipboard')
-        },
-    })
-    clipboard.value.on('success', ()=>{  // 还可以添加监听事件，如：复制成功后提示
-        popMessage('success', '文件地址已复制到剪贴板', null)
-    })
 })
 
-
-
-onUnmounted(()=>{
-    clipboard.value && clipboard.value.destroy()
-})
-
-
-function handleFileChange(file){
-    console.log(file)
+function handleFileChange(file: File) {
     formUpload.value.file = file
-    if (!formUpload.value.name){
+    if (!formUpload.value.name) {
         formUpload.value.name = file.name
     }
 }
-function showModalUpload(){
+
+function showModalUpload() {
     modalUpload.value = true
 }
-// 新增
+
 function uploadFile() {
-    if (!formUpload.value.name){
+    if (!formUpload.value.name) {
         popMessage('warning', '文件名未填写')
         return
     }
-    if (!formUpload.value.file){
+    if (!formUpload.value.file) {
         popMessage('warning', '未选择任何文件')
         return
     }
-    let requestData = new FormData()
+    const requestData = new FormData()
     requestData.append('file', formUpload.value.file)
     requestData.append('note', formUpload.value.name)
+    isUploading.value = true
     fileManagerApi
         .upload(requestData)
         .then(() => {
@@ -126,20 +116,24 @@ function uploadFile() {
         .catch(err => {
             popMessage('danger', err.message)
         })
+        .finally(() => {
+            isUploading.value = false
+        })
 }
-function getFileList(){
-    isLoading.value = true // 请求的时候显示loading
-    let params = {
+
+function getFileList() {
+    isLoading.value = true
+    const params = {
         pageNo: pager.value.pageNo,
         pageSize: pager.value.pageSize
     }
     fileManagerApi
         .list(params)
         .then(res => {
-            fileListData.value = res.data.map(item => {
-                item.date_time = dateFormatter(new Date(item.date_create))
-                return item
-            })
+            fileListData.value = res.data.map((item: EntityFile) => ({
+                ...item,
+                date_time: dateFormatter(new Date(item.date_create))
+            }))
             isLoading.value = false
         })
         .catch(() => {
@@ -149,28 +143,31 @@ function getFileList(){
 </script>
 
 <style scoped lang="scss">
-@use "../../scss/plugin" as *;
+.file-loading {
+    padding: 32px 0;
+}
 
-.file-list{
+.file-list {
     width: 100%;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-flow: row wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     align-content: flex-start;
 }
 
-// MOBILE
-@media (max-width: $grid-separate-width-sm) {
-    .file-list{
-        flex-flow: column nowrap;
-    }
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 }
 
-// DARK
-@media (prefers-color-scheme: dark) {
-    .file-list{
-    }
+:global(.file-modal) {
+    width: min(520px, calc(100vw - 32px));
 }
 
+@media (max-width: 760px) {
+    .file-list {
+        grid-template-columns: 1fr;
+    }
+}
 </style>

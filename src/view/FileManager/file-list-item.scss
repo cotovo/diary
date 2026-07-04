@@ -1,86 +1,103 @@
-@use "sass:color" as color;
-@use "../../scss/plugin" as *;
-
-.file-list-item{
-  margin-left: 20px;
-  margin-bottom: 20px;
-  padding: 12px 20px;
-  background-color: $bg-light;
-  border-radius: $radius-pc;
-  display: flex;
-  align-items: center;
-  font-size: $fz-small;
+.file-list-item {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--diary-border);
+  border-radius: var(--diary-radius);
+  background: var(--diary-surface);
+  color: var(--diary-ink);
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-areas:
+    "index info"
+    "actions actions";
+  gap: 10px 12px;
+  box-shadow: var(--diary-hairline-shadow);
 }
 
-.id{
-  flex-shrink: 0;
-  font-size: $fz-title;
-  border-radius: 100px;
-  text-align: center;
-  height: 40px;
+.file-index {
+  grid-area: index;
   width: 40px;
-  line-height: 40px;
-}
-
-.file-meta{
-  width: 80px;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: center;
+  height: 40px;
+  border-radius: var(--diary-radius);
+  background: var(--diary-surface-muted);
+  color: var(--diary-muted);
+  display: inline-flex;
   align-items: center;
-  flex-flow: row wrap;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
+.file-info {
+  grid-area: info;
+  min-width: 0;
+}
 
-.file-info{
-  min-width: 150px;
-  color: $text-label;
-  margin-left: 10px;
-  .name{
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.name {
+  color: var(--diary-ink);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  margin-top: 2px;
+  color: var(--diary-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-meta-line {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  span {
+    max-width: 100%;
+    padding: 2px 6px;
+    border-radius: var(--diary-radius-sm);
+    background: var(--diary-surface-muted);
+    color: var(--diary-muted);
+    font-size: 11px;
+    line-height: 1.35;
     overflow: hidden;
-    line-height: 1.5;
-    color: $text-title;
-    font-size: $fz-main;
-    font-weight: bold;
-  }
-  .size{
-    font-family: "JetBrainsMonoDiary", "SF UI Display", "PingFang SC", "Microsoft Yahei UI", "Microsoft Yahei", "Helvetica", sans-serif;
-    color: $text-subtitle;
-  }
-  .description{
-    white-space: nowrap;
     text-overflow: ellipsis;
-    overflow: hidden;
-    color: $text-subtitle;
-  }
-  .file-type{
-    color: $blue;
-    &.image{
-      color: $magenta;
-    }
-  }
-  .date{}
-  .path{}
-  .owner{}
-}
-
-
-// MOBILE
-@media (max-width: $grid-separate-width-sm) {
-  .file-list-item{
-    margin-left: 0;
-    width: 100%;
-    line-height: 1.2;
-    margin-bottom: 10px;
+    white-space: nowrap;
   }
 }
 
-// DARK
-@media (prefers-color-scheme: dark) {
-  .file-list-item{
-    background: linear-gradient(white, color.adjust(white, $lightness: -20%));
-  }
+.file-actions {
+  grid-area: actions;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+:global(.file-modal) {
+  width: min(520px, calc(100vw - 32px));
+}
+
+@media (max-width: 520px) {
+  .file-list-item {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .file-index {
+    width: 36px;
+    height: 36px;
+  }
+}

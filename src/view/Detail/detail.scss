@@ -2,7 +2,7 @@
 @use "../../scss/plugin" as *;
 
 .diary-detail{
-  background-color: white;
+  background-color: var(--diary-surface);
   margin: 0 auto;
 }
 
@@ -27,10 +27,11 @@
 
   .toolbar{
     display: flex;
+    gap: 8px;
     justify-content: flex-end;
     flex-shrink: 0;
     transition: all 0.3s;
-    opacity: 0;
+    opacity: 1;
   }
 
   h2.mobile-copyable{
@@ -43,9 +44,9 @@
 }
 
 .diary-content{
-  border-top: 2px dashed $color-border;
+  border-top: 1px solid var(--diary-border);
   position: relative;
-  color: $bg-main;
+  color: var(--diary-ink);
   line-height: 1.6;
   font-size: 1rem;
   margin: 0 20px;
@@ -64,7 +65,7 @@
     justify-content: flex-end;
     align-items: flex-end;
     transition: all 0.3s;
-    opacity: 0;
+    opacity: 1;
     position: absolute;
     top: 20px;
     right: 10px;
@@ -123,8 +124,8 @@
   }
 
   .diary-content{
-    border-top: 2px dashed $color-border;
-    color: $bg-main;
+    border-top: 1px solid var(--diary-border);
+    color: var(--diary-ink);
     font-size: 1rem;
     margin: 0 20px;
     padding: 20px 0 60px;
@@ -166,15 +167,15 @@
 @media (prefers-color-scheme: dark) {
 // DETAIL
 .diary-detail{
-  background-color: $dark-bg;
+  background-color: var(--diary-surface);
 }
 
   .diary-title{
     color: $dark-text-title;
   }
   .diary-content{
-    border-top-color: $dark-border-active;
-    color: $dark-text;
+    border-top-color: var(--diary-border);
+    color: var(--diary-ink);
   }
 
   .date-wrapper{
