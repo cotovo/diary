@@ -71,7 +71,7 @@ onBeforeMount(() => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         projectStore.colorMode=  'dark'
     } else {
-        projectStore.colorMode=  'dark'
+        projectStore.colorMode=  'light'
     }
 
     // 颜色模式监听

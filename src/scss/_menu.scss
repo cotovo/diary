@@ -1,124 +1,167 @@
 @use "variables" as *;
-@use "utility" as *;
 
-// MENU
-$menu-category-list-item-height: 40px;
-
-.menu-panel{
+.menu-panel {
   z-index: 10;
-  border-radius: $radius-whole-ui - 1px;  // 避免当与 list 重叠时，menu 在上， list 在下，会出现白边的情况
-  overflow: hidden;
   position: fixed;
   top: $height-navbar;
   left: 0;
-  width: 100%;
-  background-color: $bg-menu;
+  width: min(100vw, 480px);
+  overflow: hidden;
+  background: var(--diary-bg);
+  color: var(--diary-ink);
 }
 
-.menu{
+.menu-shell {
+  min-height: 100%;
   display: flex;
-  flex-flow: column;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.menu-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 2px 2px;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 750;
+    color: var(--diary-ink);
+  }
+}
+
+.menu-brand-logo {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border-radius: var(--diary-radius);
+  object-fit: contain;
+  background: var(--diary-surface);
+  border: 1px solid var(--diary-border);
+  box-shadow: var(--diary-hairline-shadow);
+}
+
+.menu-kicker {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--diary-muted);
+}
+
+.menu-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-group-header {
+  padding: 0 2px;
+  display: flex;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
+  color: var(--diary-muted);
+
+  span {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--diary-ink);
+  }
+
+  small {
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
-.menu-list{
-  display: flex;
-  justify-content: flex-start;
-  flex-flow: row wrap;
+.menu-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   list-style-type: none;
 }
 
-.menu-btn {
-  flex-shrink: 0;
-  position: relative;
-  display: block;
-  text-align: center;
-  width: 45%;
-  margin-bottom: 20px;
-  font-size: 20px;
-  color: black;
-  line-height: $menu-category-list-item-height;
-  border: 1px solid $color-main;
-  background-color: $color-main;
-  border-radius: 5px;
-  @extend .btn-like;
+.menu-category-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
-
-
-
-// MENU CATEGORY
-.menu-category-list{
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-flow: row wrap;
-}
 .menu-category-item {
-  @extend .btn-like;
-  flex-shrink: 0;
+  min-height: 42px;
   position: relative;
-  display: block;
-  text-align: center;
-  width: 31%;
-  margin-bottom: 20px;
-  font-size: 20px;
-  color: white;
-  line-height: $menu-category-list-item-height;
-  border-radius: 5px;
-  border: 1px dashed $gray;
-  &.menu-category-shared{
-    background-color: transparent;
-    &.active{
-      background-color: white;
-      color: $text-title;
-      border: 1px solid white;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--diary-border);
+  border-radius: var(--diary-radius);
+  background: var(--diary-surface);
+  color: var(--diary-ink);
+  cursor: pointer;
+
+  &.active {
+    border-color: var(--diary-accent);
+    box-shadow: 0 0 0 3px var(--diary-focus);
   }
-  .count{
-    color: white;
-    display: block;
+
+  .count {
     position: absolute;
     top: 5px;
     right: 7px;
     font-size: 10px;
     line-height: 1;
+    color: var(--diary-muted);
   }
 }
 
-.category-operations-container{
-  padding-top: 20px;
-  border-top: 1px solid $bg-main;
+.category-operations-container {
+  padding-top: 18px;
+  border-top: 1px solid var(--diary-border);
 }
 
-
-// PC
 @media (min-width: $grid-separate-width-big) {
   .menu-panel {
-    width: $menu-panel-big;
-  }
-  .menu-category-item {
+    width: min(480px, 34vw);
   }
 }
 
-// PC & IPAD
 @media (min-width: $grid-separate-width-md) and (max-width: $grid-separate-width-big) {
-  .menu-panel{
-    width: $menu-panel-sm;
-  }
-  .user-profile{
-    padding: 30px 50px;
-  }
-
-  .menu-category-item {
-    width: 40%;
+  .menu-panel {
+    width: min(440px, 70vw);
   }
 }
 
-@media (max-width: $grid-separate-width-md) {
-  .user-profile{
-    padding: 30px 50px 50px;
+@media (max-width: $grid-separate-width-sm) {
+  .menu-panel {
+    width: 100vw;
   }
-  .menu-list{
+
+  .menu-shell {
+    gap: 14px;
+  }
+
+  .menu-brand h2 {
+    font-size: 20px;
+  }
+
+  .menu-list,
+  .menu-category-list {
+    grid-template-columns: 1fr;
   }
 }

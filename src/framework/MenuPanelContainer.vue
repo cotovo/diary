@@ -11,33 +11,24 @@ const projectStore = useProjectStore()
 </script>
 
 <style lang="scss" scoped>
-@use "../scss/plugin" as *;
 .menu-panel-container{
-    padding: 30px;
+    height: 100%;
+    padding: 18px;
     overflow-y: auto;
-    background-color: $bg-menu;
-    border-radius: $radius-whole-ui;
+    background: var(--diary-bg);
+    border-right: 1px solid var(--diary-border);
+    box-shadow: var(--diary-card-shadow);
 }
 
-// MacbookPro
-@media (min-width: $grid-separate-width-sm ) and (max-width: $grid-separate-width-big) {
+@media (min-width: 768px) and (max-width: 1440px) {
     .menu-panel-container {
-        padding: 20px 15px;
+        padding: 16px;
     }
 }
 
-// MOBILE
-@media (max-width: $grid-separate-width-sm) {
+@media (max-width: 640px) {
     .menu-panel-container {
-        padding: 20px 15px;
+        padding: 14px 12px calc(24px + env(safe-area-inset-bottom));
     }
-}
-
-// DARK
-@media (prefers-color-scheme: dark) {
-    .menu-panel-container{
-        background-color: $dark-bg-menu;
-    }
-
 }
 </style>
